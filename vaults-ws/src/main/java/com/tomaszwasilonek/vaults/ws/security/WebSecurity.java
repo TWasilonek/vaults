@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.service.UserService;
+import com.tomaszwasilonek.vaults.ws.service.impl.AuthenticationFilter;
+import com.tomaszwasilonek.vaults.ws.service.impl.SecurityConstants;
 
 
 @EnableWebSecurity
@@ -25,10 +27,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests()
 			// no authentication needed for POST requests to '/users'
-			.antMatchers(HttpMethod.POST, "/users")
+			.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
 			.permitAll()
 			// For all other requests authentication is required
-			.anyRequest().authenticated();
+			.anyRequest().authenticated()
+			// add a custom auth mechanism
+			.and().addFilter(new AuthenticationFilter(authenticationManager()));
 	}
 	
 	@Override
