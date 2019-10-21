@@ -1,4 +1,4 @@
-package com.tomaszwasilonek.vaults.ws.service.impl;
+package com.tomaszwasilonek.vaults.ws.security;
 
 import com.tomaszwasilonek.vaults.ws.SpringApplicationContext;
 

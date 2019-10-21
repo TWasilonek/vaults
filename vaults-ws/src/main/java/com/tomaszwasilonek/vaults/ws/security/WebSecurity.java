@@ -9,9 +9,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.service.UserService;
-import com.tomaszwasilonek.vaults.ws.service.impl.AuthenticationFilter;
-import com.tomaszwasilonek.vaults.ws.service.impl.AuthorizationFilter;
-import com.tomaszwasilonek.vaults.ws.service.impl.SecurityConstants;
 
 
 @EnableWebSecurity

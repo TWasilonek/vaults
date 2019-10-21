@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.tomaszwasilonek.vaults.ws.service.impl.AppProperties;
+import com.tomaszwasilonek.vaults.ws.security.AppProperties;
 
 @SpringBootApplication
 public class VaultsWsApplication {

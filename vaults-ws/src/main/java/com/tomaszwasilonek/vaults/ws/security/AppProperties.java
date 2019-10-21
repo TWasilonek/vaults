@@ -1,4 +1,4 @@
-package com.tomaszwasilonek.vaults.ws.service.impl;
+package com.tomaszwasilonek.vaults.ws.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
