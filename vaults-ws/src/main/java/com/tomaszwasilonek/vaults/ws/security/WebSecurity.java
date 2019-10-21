@@ -5,10 +5,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.service.impl.AuthenticationFilter;
+import com.tomaszwasilonek.vaults.ws.service.impl.AuthorizationFilter;
 import com.tomaszwasilonek.vaults.ws.service.impl.SecurityConstants;
 
 
@@ -31,13 +33,27 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.permitAll()
 			// For all other requests authentication is required
 			.anyRequest().authenticated()
-			// add a custom auth mechanism
-			.and().addFilter(new AuthenticationFilter(authenticationManager()));
+			.and()
+			// add a custom authentication mechanism
+			.addFilter(getAuthenticationFilter())
+			// add a custom authorization mechanism
+			.addFilter(new AuthorizationFilter(authenticationManager()))
+			// don't create a session and don't cache the JWT token
+			.sessionManagement()
+			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+	}
+	
+	// Set a custom URI for the login.
+	// By default SpringSecurity sets it to "/login"
+	public AuthenticationFilter getAuthenticationFilter() throws Exception {
+		final AuthenticationFilter filter = new AuthenticationFilter(authenticationManager());
+		filter.setFilterProcessesUrl("/users/login");
+		return filter;
 	}
 	
 }
