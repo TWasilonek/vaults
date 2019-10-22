@@ -17,6 +17,9 @@ import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
 
 @RestController
@@ -28,7 +31,7 @@ public class UserController {
 	
 	@GetMapping(
 			path="/{id}",
-			produces= { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
 			)
 	public UserRest getUser(@PathVariable String id) {
 		UserRest returnValue = new UserRest();
@@ -38,6 +41,7 @@ public class UserController {
 		
 		return returnValue;
 	}
+	
 	
 	@PostMapping(
 			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
@@ -57,13 +61,40 @@ public class UserController {
 		return returnValue;
 	}
 	
-	@PutMapping()
-	public String updateUser() {
-		return "Update user was called";
+	
+	@PutMapping(
+			path="/{id}",
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) throws Exception {
+		UserRest returnValue = new UserRest();
+		
+		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()) {
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
+		
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDto);
+
+		UserDto updatedUser = userService.updateUser(id, userDto);
+		BeanUtils.copyProperties(updatedUser, returnValue);
+		
+		return returnValue;
 	}
 	
-	@DeleteMapping()
-	public String deleteUser() {
-		return "Delete user was called";
+	
+	@DeleteMapping(
+			path="/{id}",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public OperationStatusModel deleteUser(@PathVariable String id) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.DELETE.name());
+		
+		userService.deleteUser(id);
+		
+		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
 	}
 }
