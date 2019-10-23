@@ -27,7 +27,7 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
 
 @RestController
-@RequestMapping("/users") // http://localhost:8080/users
+@RequestMapping("/users") // rest/v1/users
 public class UserController {
 	
 	@Autowired
