@@ -11,6 +11,7 @@
 	<groupId>com.tomaszwasilonek.vaults.ws</groupId>
 	<artifactId>vaults-ws</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>vaults-ws</name>
 	<description>Web service for Vaults project</description>
 
@@ -60,6 +61,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-tomcat</artifactId>
+		   	<scope>provided</scope>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
