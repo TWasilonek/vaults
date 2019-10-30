@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
 
 public interface UserService extends UserDetailsService {
 	
@@ -19,5 +20,7 @@ public interface UserService extends UserDetailsService {
 	List<UserDto> getUsers(int page, int limit);
 	
 	void deleteUser(String userId);
+	
+	VaultsDto createVault(String userId, VaultsDto vault);
 	
 }

@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.VaultsRest;
 
 @RestController
 @RequestMapping("/users") // http://localhost:8080/rest/v1/users
@@ -119,6 +122,26 @@ public class UserController {
 		userService.deleteUser(id);
 		
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
+	}
+	
+	
+	@PostMapping(
+			path="/{userId}/vaults",
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public VaultsRest createUserVault(@PathVariable String userId, @RequestBody VaultsDetailsRequestModel vaultDetails) {
+		VaultsRest returnValue = new VaultsRest();
+		
+//		if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(
+//		
+		VaultsDto vaultsDto = new VaultsDto();
+		BeanUtils.copyProperties(vaultDetails, vaultsDto);
+		
+		VaultsDto createdVault = userService.createVault(vaultsDto);
+		BeanUtils.copyProperties(createdVault, returnValue);
+		
 		return returnValue;
 	}
 }

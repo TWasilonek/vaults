@@ -20,6 +20,7 @@ import com.tomaszwasilonek.vaults.ws.io.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 
 @Service
@@ -121,6 +122,18 @@ public class UserServiceImpl implements UserService {
 		return mapUserEntityToUserDto(userEntity);
 	}
 	
+	@Override
+	public VaultsDto createVault(String userId, VaultsDto vault) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		// TODO get user vaults
+		// TODO check if vault name is already taken and throw error if yes
+		// TODO create vault and connect it to user
+		// TODO return created vault details
+		return null;
+	}
+
 	private UserDto saveAndReturnStoredUserDetails(UserEntity user) {
 		UserEntity storedUserDetails = userRepository.save(user);
 		return mapUserEntityToUserDto(storedUserDetails);
