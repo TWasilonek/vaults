@@ -16,14 +16,6 @@ public class VaultsDto implements Serializable {
 		this.id = id;
 	}
 
-	public String getVaultId() {
-		return vaultId;
-	}
-
-	public void setVaultId(String vaultId) {
-		this.vaultId = vaultId;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -31,4 +23,14 @@ public class VaultsDto implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public String getVaultId() {
+		return vaultId;
+	}
+
+	public void setVaultId(String vaultId) {
+		this.vaultId = vaultId;
+	}
+	
+	
 }

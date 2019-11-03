@@ -18,6 +18,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.io.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
+import com.tomaszwasilonek.vaults.ws.service.VaultsService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
@@ -34,6 +35,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	VaultsService vaultsService;
 	
 	@Override
 	public UserDto createUser(UserDto user) {
@@ -127,11 +131,9 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		
 		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		// TODO get user vaults
-		// TODO check if vault name is already taken and throw error if yes
-		// TODO create vault and connect it to user
-		// TODO return created vault details
-		return null;
+		
+		VaultsDto createdVault = vaultsService.createVault(userEntity, vault);
+		return createdVault;
 	}
 
 	private UserDto saveAndReturnStoredUserDetails(UserEntity user) {

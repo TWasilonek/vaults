@@ -133,13 +133,11 @@ public class UserController {
 			)
 	public VaultsRest createUserVault(@PathVariable String userId, @RequestBody VaultsDetailsRequestModel vaultDetails) {
 		VaultsRest returnValue = new VaultsRest();
-		
-//		if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(
-//		
+	
 		VaultsDto vaultsDto = new VaultsDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 		
-		VaultsDto createdVault = userService.createVault(vaultsDto);
+		VaultsDto createdVault = userService.createVault(userId, vaultsDto);
 		BeanUtils.copyProperties(createdVault, returnValue);
 		
 		return returnValue;
