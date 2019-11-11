@@ -23,4 +23,11 @@ public interface UserService extends UserDetailsService {
 	
 	VaultsDto createVault(String userId, VaultsDto vault);
 	
+	List<VaultsDto> getVaults(String userId);
+	
+	VaultsDto getVaultByVaultId(String userId, String vaultId);
+	
+	VaultsDto updateVault(String userId, String vaultId, VaultsDto vaultDetails);
+	
+	void deleteVault(String userId, String vaultId);
 }

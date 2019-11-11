@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
 		return saveAndReturnStoredUserDetails(userEntity);
 	}
 	
-
 	@Override
 	public void deleteUser(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
@@ -77,7 +76,6 @@ public class UserServiceImpl implements UserService {
 		userRepository.delete(userEntity);
 	}
 	
-
 	@Override
 	public List<UserDto> getUsers(int page, int limit) {
 		List<UserDto> returnValue = new ArrayList<>();
@@ -129,11 +127,45 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public VaultsDto createVault(String userId, VaultsDto vault) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		
 		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		VaultsDto createdVault = vaultsService.createVault(userEntity, vault);
 		return createdVault;
+	}
+	
+	@Override
+	public List<VaultsDto> getVaults(String userId) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		List<VaultsDto> returnValue = vaultsService.getVaults(userEntity);
+		return returnValue;
+	}
+
+	@Override
+	public VaultsDto getVaultByVaultId(String userId, String vaultId) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		VaultsDto returnValue = vaultsService.getVault(vaultId);
+		return returnValue;
+	}
+
+	@Override
+	public VaultsDto updateVault(String userId, String vaultId, VaultsDto vaultDetails) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		VaultsDto returnValue = vaultsService.updateVault(vaultId, vaultDetails);
+		return returnValue;
+	}
+
+	@Override
+	public void deleteVault(String userId, String vaultId) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		vaultsService.deleteVault(vaultId);
 	}
 
 	private UserDto saveAndReturnStoredUserDetails(UserEntity user) {

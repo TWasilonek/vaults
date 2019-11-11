@@ -46,6 +46,7 @@ public class UserController {
 		
 		List<UserDto> users = userService.getUsers(page, limit);
 		
+		// TODO change to modelmapper
 		for (UserDto userDto : users) {
 			UserRest userModel = new UserRest();
 			BeanUtils.copyProperties(userDto, userModel);
@@ -140,6 +141,76 @@ public class UserController {
 		VaultsDto createdVault = userService.createVault(userId, vaultsDto);
 		BeanUtils.copyProperties(createdVault, returnValue);
 		
+		return returnValue;
+	}
+	
+	@GetMapping(
+			path="/{id}/vaults",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public List<VaultsRest> getVaults(@PathVariable String id) {
+		
+		List<VaultsRest> returnValue = new ArrayList<>();
+		
+		List<VaultsDto> vaults = userService.getVaults(id);
+		
+		// TODO change to modelmapper
+		if (vaults != null && !vaults.isEmpty()) {
+			for (VaultsDto vaultsDto : vaults) {
+				VaultsRest vaultModel = new VaultsRest();
+				BeanUtils.copyProperties(vaultsDto, vaultModel);
+				returnValue.add(vaultModel);
+			}
+		}
+		
+		return returnValue;
+	}
+	
+	@GetMapping(
+			path="/{userId}/vaults/{vaultId}",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public VaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
+		VaultsRest returnValue = new VaultsRest();
+
+		VaultsDto vault = userService.getVaultByVaultId(userId, vaultId);
+		BeanUtils.copyProperties(vault, returnValue);
+		
+		return returnValue;
+	}
+	
+	@PutMapping(
+			path="/{userId}/vaults/{vaultId}",
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public VaultsRest updateVault(
+			@PathVariable String userId,
+			@PathVariable String vaultId,
+			@RequestBody VaultsDetailsRequestModel vaultDetails
+			) throws Exception {
+		VaultsRest returnValue = new VaultsRest();
+		
+		VaultsDto vaultsDto = new VaultsDto();
+		BeanUtils.copyProperties(vaultDetails, vaultsDto);
+
+		VaultsDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
+		BeanUtils.copyProperties(updatedVault, returnValue);
+		
+		return returnValue;
+	}
+	
+	@DeleteMapping(
+			path="/{userId}/vaults/{vaultId}",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+			)
+	public OperationStatusModel deleteVault(@PathVariable String userId, @PathVariable String vaultId) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.DELETE.name());
+		
+		userService.deleteVault(userId, vaultId);
+		
+		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;
 	}
 }
