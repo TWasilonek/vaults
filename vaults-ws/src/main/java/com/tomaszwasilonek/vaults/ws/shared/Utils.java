@@ -3,9 +3,9 @@ package com.tomaszwasilonek.vaults.ws.shared;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class Utils {
 	
 	private final Random RANDOM = new SecureRandom();
