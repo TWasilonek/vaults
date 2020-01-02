@@ -33,11 +33,12 @@ class UserServiceImplTest {
 	@Mock
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	String userId = "abcde1234";
-	String rawPassword = "jhdsa6hbsa6boi838";
-	String email = "test@test.com";
-	String name = "Tom";
-	String lastName = "Tester";
+	final String USER_ID = "abcde1234";
+	final String RAW_PASSWORD = "jhdsa6hbsa6boi838";
+	final String EMAIL = "test@test.com";
+	final String FIRST_NAME = "Tom";
+	final String LAST_NAME = "Tester";
+	
 	
 	UserEntity userEntity;
 
@@ -48,11 +49,11 @@ class UserServiceImplTest {
 		// mock user entity
 		userEntity = new UserEntity();
 		userEntity.setId(1L);
-		userEntity.setFirstName(name);
-		userEntity.setLastName(lastName);
-		userEntity.setUserId(userId);
-		userEntity.setEncryptedPassword(rawPassword);
-		userEntity.setEmail(email);
+		userEntity.setFirstName(FIRST_NAME);
+		userEntity.setLastName(LAST_NAME);
+		userEntity.setUserId(USER_ID);
+		userEntity.setEncryptedPassword(RAW_PASSWORD);
+		userEntity.setEmail(EMAIL);
 	}
 
 	@Test
@@ -75,26 +76,26 @@ class UserServiceImplTest {
 			.thenReturn(null);
 		
 		assertThrows(UserServiceException.class, () -> {
-			userService.getUser(email);
+			userService.getUser(EMAIL);
 		});
 	}
 	
 	@Test
 	final void testCreateUser() {
 		when(userRepository.findByEmail(anyString())).thenReturn(null);
-		when(utils.generateUserId(anyInt())).thenReturn(userId);
-		when(bCryptPasswordEncoder.encode(anyString())).thenReturn(rawPassword);
+		when(utils.generateUserId(anyInt())).thenReturn(USER_ID);
+		when(bCryptPasswordEncoder.encode(anyString())).thenReturn(RAW_PASSWORD);
 		when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 		
 		UserDto userDto = new UserDto();
-		userDto.setPassword(rawPassword);
+		userDto.setPassword(RAW_PASSWORD);
 		UserDto storedUserDetails = userService.createUser(userDto);
 	
 		assertNotNull(storedUserDetails);
 		assertEquals(userEntity.getFirstName(), storedUserDetails.getFirstName());
 		assertEquals(userEntity.getLastName(), storedUserDetails.getLastName());
 		assertEquals(userEntity.getEmail(), storedUserDetails.getEmail());
-		verify(bCryptPasswordEncoder, times(1)).encode(rawPassword);
+		verify(bCryptPasswordEncoder, times(1)).encode(RAW_PASSWORD);
 		verify(utils, times(1)).generateUserId(anyInt());
 		verify(userRepository, times(1)).save(any(UserEntity.class));
 	}
@@ -105,7 +106,7 @@ class UserServiceImplTest {
 			.thenReturn(userEntity);
 		
 		UserDto userDto = new UserDto();
-		userDto.setEmail(email);
+		userDto.setEmail(EMAIL);
 		
 		assertThrows(UserServiceException.class, () -> {
 			userService.createUser(userDto);
