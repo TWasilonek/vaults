@@ -28,6 +28,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			// no authentication needed for POST requests to '/users'
 			.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
 			.permitAll()
+			// allow H2 console requests
+			.antMatchers(SecurityConstants.H2_CONSOLE)
+			.permitAll()
 			// For all other requests authentication is required
 			.anyRequest().authenticated()
 			.and()
@@ -38,6 +41,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			// don't create a session and don't cache the JWT token
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		// Only for using H2 - uncomment when you want to use H2 in the browser
+		// Should be commented out by default
+//		http.headers().frameOptions().disable();
 	}
 	
 	@Override

@@ -26,118 +26,127 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 
 @Service
 public class UserServiceImpl implements UserService {
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	Utils utils;
-	
+
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
 	@Autowired
 	VaultsService vaultsService;
-	
+
 	@Override
 	public UserDto createUser(UserDto user) {
-		
-		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage()); 
-	
+
+		if (userRepository.findByEmail(user.getEmail()) != null)
+			throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(user, userEntity);
-		
+
 		String publicUserId = utils.generateUserId(30);
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userEntity.setUserId(publicUserId);
-		
+
 		return saveAndReturnStoredUserDetails(userEntity);
 	}
 
 	@Override
 	public UserDto updateUser(String userId, UserDto user) {
-		
+
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		userEntity.setFirstName(user.getFirstName());
 		userEntity.setLastName(user.getLastName());
-		
+
 		return saveAndReturnStoredUserDetails(userEntity);
 	}
-	
+
 	@Override
 	public void deleteUser(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		userRepository.delete(userEntity);
 	}
-	
+
 	@Override
 	public List<UserDto> getUsers(int page, int limit) {
 		List<UserDto> returnValue = new ArrayList<>();
-		
+
 		// paging should start with 1
-		if (page > 0) page--;
-		
+		if (page > 0)
+			page--;
+
 		Pageable pageableRequest = PageRequest.of(page, limit);
-		
+
 		Page<UserEntity> usersPage = userRepository.findAll(pageableRequest);
 		List<UserEntity> users = usersPage.getContent();
-		
+
 		for (UserEntity userEntity : users) {
 			UserDto userDto = new UserDto();
 			BeanUtils.copyProperties(userEntity, userDto);
 			returnValue.add(userDto);
 		}
-		
+
 		return returnValue;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
 
 	@Override
 	public UserDto getUser(String email) {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		return mapUserEntityToUserDto(userEntity);
 	}
 
 	@Override
 	public UserDto getUserByUserId(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		return mapUserEntityToUserDto(userEntity);
 	}
-	
+
 	@Override
 	public VaultsDto createVault(String userId, VaultsDto vault) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		VaultsDto createdVault = vaultsService.createVault(userEntity, vault);
 		return createdVault;
 	}
-	
+
 	@Override
 	public List<VaultsDto> getVaults(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		List<VaultsDto> returnValue = vaultsService.getVaults(userEntity);
 		return returnValue;
 	}
@@ -145,8 +154,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public VaultsDto getVaultByVaultId(String userId, String vaultId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		VaultsDto returnValue = vaultsService.getVault(vaultId);
 		return returnValue;
 	}
@@ -154,8 +164,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public VaultsDto updateVault(String userId, String vaultId, VaultsDto vaultDetails) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		VaultsDto returnValue = vaultsService.updateVault(vaultId, vaultDetails);
 		return returnValue;
 	}
@@ -163,8 +174,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteVault(String userId, String vaultId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-		
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		vaultsService.deleteVault(vaultId);
 	}
 
@@ -172,7 +184,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity storedUserDetails = userRepository.save(user);
 		return mapUserEntityToUserDto(storedUserDetails);
 	}
-	
+
 	private UserDto mapUserEntityToUserDto(UserEntity user) {
 		UserDto returnValue = new UserDto();
 		BeanUtils.copyProperties(user, returnValue);
