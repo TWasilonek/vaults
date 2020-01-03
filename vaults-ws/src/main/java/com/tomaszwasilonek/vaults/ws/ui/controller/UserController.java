@@ -32,128 +32,111 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.VaultsRest;
 @RestController
 @RequestMapping("/users") // http://localhost:8080/rest/v1/users
 public class UserController {
-	
+
 	@Autowired
 	UserService userService;
-	
+
 	@GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public List<UserRest> getUsers(
-			@RequestParam(value="page", defaultValue="1") int page,
-			@RequestParam(value="limit", defaultValue="25") int limit
-			)
-	{	
+	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "limit", defaultValue = "25") int limit) {
 		List<UserRest> returnValue = new ArrayList<>();
-		
+
 		List<UserDto> users = userService.getUsers(page, limit);
-		
+
 		// TODO change to modelmapper
 		for (UserDto userDto : users) {
 			UserRest userModel = new UserRest();
 			BeanUtils.copyProperties(userDto, userModel);
 			returnValue.add(userModel);
 		}
-		
+
 		return returnValue;
 	}
-	
-	
-	@GetMapping(
-			path="/{id}",
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserRest getUser(@PathVariable String id) {
 		UserRest returnValue = new UserRest();
 
 		UserDto user = userService.getUserByUserId(id);
 		BeanUtils.copyProperties(user, returnValue);
-		
+
 		return returnValue;
 	}
-	
-	
-	@PostMapping(
-			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, produces = {
+			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
 		UserRest returnValue = new UserRest();
-		
-		if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		
-		UserDto userDto = new UserDto();
-		BeanUtils.copyProperties(userDetails, userDto);
-		
-		UserDto createdUser = userService.createUser(userDto);
-		BeanUtils.copyProperties(createdUser, returnValue);
-		
-		return returnValue;
-	}
-	
-	
-	@PutMapping(
-			path="/{id}",
-			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
-	public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) throws Exception {
-		UserRest returnValue = new UserRest();
-		
-		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()) {
+
+		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
+				|| userDetails.getEmail().isEmpty() || userDetails.getPassword().isEmpty()) {
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
-		
+
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDto);
+
+		UserDto createdUser = userService.createUser(userDto);
+		BeanUtils.copyProperties(createdUser, returnValue);
+
+		return returnValue;
+	}
+
+	@PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
+			throws Exception {
+		UserRest returnValue = new UserRest();
+
+		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
+				|| userDetails.getEmail().isEmpty()) {
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
+
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
 
 		UserDto updatedUser = userService.updateUser(id, userDto);
 		BeanUtils.copyProperties(updatedUser, returnValue);
-		
+
 		return returnValue;
 	}
-	
-	
-	@DeleteMapping(
-			path="/{id}",
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public OperationStatusModel deleteUser(@PathVariable String id) {
 		OperationStatusModel returnValue = new OperationStatusModel();
 		returnValue.setOperationName(RequestOperationName.DELETE.name());
-		
+
 		userService.deleteUser(id);
-		
+
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;
 	}
-	
-	
-	@PostMapping(
-			path="/{userId}/vaults",
-			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
-	public VaultsRest createUserVault(@PathVariable String userId, @RequestBody VaultsDetailsRequestModel vaultDetails) {
+
+	@PostMapping(path = "/{userId}/vaults", consumes = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public VaultsRest createUserVault(@PathVariable String userId,
+			@RequestBody VaultsDetailsRequestModel vaultDetails) {
 		VaultsRest returnValue = new VaultsRest();
-	
+
 		VaultsDto vaultsDto = new VaultsDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
-		
+
 		VaultsDto createdVault = userService.createVault(userId, vaultsDto);
 		BeanUtils.copyProperties(createdVault, returnValue);
-		
+
 		return returnValue;
 	}
-	
-	@GetMapping(
-			path="/{id}/vaults",
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@GetMapping(path = "/{id}/vaults", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public List<VaultsRest> getVaults(@PathVariable String id) {
-		
+
 		List<VaultsRest> returnValue = new ArrayList<>();
-		
+
 		List<VaultsDto> vaults = userService.getVaults(id);
-		
+
 		// TODO change to modelmapper
 		if (vaults != null && !vaults.isEmpty()) {
 			for (VaultsDto vaultsDto : vaults) {
@@ -162,54 +145,45 @@ public class UserController {
 				returnValue.add(vaultModel);
 			}
 		}
-		
+
 		return returnValue;
 	}
-	
-	@GetMapping(
-			path="/{userId}/vaults/{vaultId}",
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@GetMapping(path = "/{userId}/vaults/{vaultId}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
 	public VaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
 		VaultsRest returnValue = new VaultsRest();
 
 		VaultsDto vault = userService.getVaultByVaultId(userId, vaultId);
 		BeanUtils.copyProperties(vault, returnValue);
-		
+
 		return returnValue;
 	}
-	
-	@PutMapping(
-			path="/{userId}/vaults/{vaultId}",
-			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
-	public VaultsRest updateVault(
-			@PathVariable String userId,
-			@PathVariable String vaultId,
-			@RequestBody VaultsDetailsRequestModel vaultDetails
-			) throws Exception {
+
+	@PutMapping(path = "/{userId}/vaults/{vaultId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public VaultsRest updateVault(@PathVariable String userId, @PathVariable String vaultId,
+			@RequestBody VaultsDetailsRequestModel vaultDetails) throws Exception {
 		VaultsRest returnValue = new VaultsRest();
-		
+
 		VaultsDto vaultsDto = new VaultsDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 
 		VaultsDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
 		BeanUtils.copyProperties(updatedVault, returnValue);
-		
+
 		return returnValue;
 	}
-	
-	@DeleteMapping(
-			path="/{userId}/vaults/{vaultId}",
-			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-			)
+
+	@DeleteMapping(path = "/{userId}/vaults/{vaultId}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
 	public OperationStatusModel deleteVault(@PathVariable String userId, @PathVariable String vaultId) {
 		OperationStatusModel returnValue = new OperationStatusModel();
 		returnValue.setOperationName(RequestOperationName.DELETE.name());
-		
+
 		userService.deleteVault(userId, vaultId);
-		
+
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;
 	}
