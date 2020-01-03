@@ -2,7 +2,7 @@ package com.tomaszwasilonek.vaults.ws.shared.dto;
 
 import java.io.Serializable;
 
-public class VaultsDto implements Serializable {
+public class UserVaultsDto implements Serializable {
 	private static final long serialVersionUID = -3897005569956429345L;
 	private long id;
 	private String vaultId;

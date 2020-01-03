@@ -2,6 +2,7 @@ package com.tomaszwasilonek.vaults.ws.ui.model.request;
 
 public class VaultsDetailsRequestModel {
 	private String name;
+	private double balance;
 
 	public String getName() {
 		return name;
@@ -10,6 +11,12 @@ public class VaultsDetailsRequestModel {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
 }

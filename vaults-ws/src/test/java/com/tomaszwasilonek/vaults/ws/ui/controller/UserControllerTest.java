@@ -1,6 +1,8 @@
 package com.tomaszwasilonek.vaults.ws.ui.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,13 +18,17 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
 
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
+import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
 import com.tomaszwasilonek.vaults.ws.service.impl.UserServiceImpl;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultsRest;
 
 class UserControllerTest {
 
@@ -66,6 +72,7 @@ class UserControllerTest {
 		List<UserRest> users = userController.getUsers(1, 2);
 		assertNotNull(users);
 		assertEquals(2, users.size());
+		verify(userService, times(1)).getUsers(anyInt(), anyInt());
 	}
 
 	@Test
@@ -79,6 +86,7 @@ class UserControllerTest {
 		assertEquals(userData.getEmail(), userRest.getEmail());
 		assertEquals(userData.getFirstName(), userRest.getFirstName());
 		assertEquals(userData.getLastName(), userRest.getLastName());
+		verify(userService, times(1)).getUserByUserId(anyString());
 	}
 
 	@Test
@@ -94,6 +102,7 @@ class UserControllerTest {
 			assertEquals(userData.getEmail(), userRest.getEmail());
 			assertEquals(userData.getFirstName(), userRest.getFirstName());
 			assertEquals(userData.getLastName(), userRest.getLastName());
+			verify(userService, times(1)).createUser(any(UserDto.class));
 		});
 	}
 
@@ -134,6 +143,7 @@ class UserControllerTest {
 			assertEquals(userData.getEmail(), userRest.getEmail());
 			assertEquals("ChangedFirstName", userRest.getFirstName());
 			assertEquals("ChangedLastName", userRest.getLastName());
+			verify(userService, times(1)).updateUser(anyString(), any(UserDto.class));
 		});
 	}
 	
@@ -173,5 +183,54 @@ class UserControllerTest {
 		assertNotNull(response);
 		assertEquals(RequestOperationName.DELETE.name(), response.getOperationName());
 		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
+		verify(userService, times(1)).deleteUser(anyString());
+	}
+	
+	@Test
+	void testCreateVaults() {
+		UserVaultsDto newVault = new UserVaultsDto();
+		newVault.setName("VaultName");
+		
+		when(userService.createVault(anyString(), any(UserVaultsDto.class))).thenReturn(newVault);
+		
+		VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+		UserVaultsRest userVaultsRest = userController.createUserVault(USER_ID, vaultDetails);
+		
+		assertNotNull(userVaultsRest);
+		assertEquals("VaultName", userVaultsRest.getName());
+		assertEquals(0.00, userVaultsRest.getBalance());
+		verify(userService, times(1)).createVault(anyString(), any(UserVaultsDto.class));
+	}
+	
+	@Test
+	void testCreateVaults_missingRequiredFields() {
+		// TODO: change to a new exception type UserControllerException, 
+		// and replace all exceptions in the UserController
+		assertThrows(VaultsServiceException.class, () -> {
+			VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+			vaultDetails.setName("");
+			
+			userController.createUserVault(USER_ID, vaultDetails);
+		});
+	}
+	
+	@Test
+	void testGetVaults() {
+//		fail("not implemented");
+	}
+	
+	@Test
+	void testGetVault() {
+		// TODO
+	}
+	
+	@Test
+	void testUpdateVault() {
+		// TODO
+	}
+	
+	@Test
+	void testDeleteVault() {
+		// TODO
 	}
 }

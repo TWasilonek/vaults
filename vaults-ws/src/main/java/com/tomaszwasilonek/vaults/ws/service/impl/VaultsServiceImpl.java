@@ -14,7 +14,7 @@ import com.tomaszwasilonek.vaults.ws.io.entity.VaultsEntity;
 import com.tomaszwasilonek.vaults.ws.io.repositories.VaultsRepository;
 import com.tomaszwasilonek.vaults.ws.service.VaultsService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 
 @Component
@@ -28,7 +28,7 @@ public class VaultsServiceImpl implements VaultsService {
 	
 
 	@Override
-	public VaultsDto createVault(UserEntity user, VaultsDto vault) {
+	public UserVaultsDto createVault(UserEntity user, UserVaultsDto vault) {
 		
 		// TODO: check if vault name is already taken
 //		if (user.getVaultByName(vault.getName()));
@@ -46,21 +46,21 @@ public class VaultsServiceImpl implements VaultsService {
 	}
 	
 	@Override
-	public List<VaultsDto> getVaults(UserEntity user) {
-		List<VaultsDto> returnValue = new ArrayList<>();
+	public List<UserVaultsDto> getVaults(UserEntity user) {
+		List<UserVaultsDto> returnValue = new ArrayList<>();
 		ModelMapper modelMapper = new ModelMapper();
 		
 		Iterable<VaultsEntity> vaults = vaultsRepository.findAllByUserDetails(user);
 		
 		for (VaultsEntity vaultsEntity : vaults) {
-			returnValue.add(modelMapper.map(vaultsEntity, VaultsDto.class));
+			returnValue.add(modelMapper.map(vaultsEntity, UserVaultsDto.class));
 		}
 		
 		return returnValue;
 	}
 
 	@Override
-	public VaultsDto getVault(String vaultId) {
+	public UserVaultsDto getVault(String vaultId) {
 		VaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
 		
 		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
@@ -69,7 +69,7 @@ public class VaultsServiceImpl implements VaultsService {
 	}
 
 	@Override
-	public VaultsDto updateVault(String vaultId, VaultsDto vaultDetails) {
+	public UserVaultsDto updateVault(String vaultId, UserVaultsDto vaultDetails) {
 		VaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
 		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
@@ -86,13 +86,13 @@ public class VaultsServiceImpl implements VaultsService {
 		vaultsRepository.delete(vault);
 	}
 
-	private VaultsDto saveAndReturnStoredVaultDetails(VaultsEntity vault) {
+	private UserVaultsDto saveAndReturnStoredVaultDetails(VaultsEntity vault) {
 		VaultsEntity storedVaultDetails = vaultsRepository.save(vault);
 		return mapVaultsEntityToVaultsDto(storedVaultDetails);
 	}
 	
-	private VaultsDto mapVaultsEntityToVaultsDto(VaultsEntity vault) {
-		VaultsDto returnValue = new VaultsDto();
+	private UserVaultsDto mapVaultsEntityToVaultsDto(VaultsEntity vault) {
+		UserVaultsDto returnValue = new UserVaultsDto();
 		BeanUtils.copyProperties(vault, returnValue);
 		return returnValue;
 	}
