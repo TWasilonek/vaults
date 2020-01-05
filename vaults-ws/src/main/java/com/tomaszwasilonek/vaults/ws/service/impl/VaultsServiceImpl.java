@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
 import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
-import com.tomaszwasilonek.vaults.ws.io.entity.VaultsEntity;
+import com.tomaszwasilonek.vaults.ws.io.entity.UserVaultsEntity;
 import com.tomaszwasilonek.vaults.ws.io.repositories.VaultsRepository;
 import com.tomaszwasilonek.vaults.ws.service.VaultsService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
@@ -34,13 +34,14 @@ public class VaultsServiceImpl implements VaultsService {
 //		if (user.getVaultByName(vault.getName()));
 		
 		
-		VaultsEntity vaultsEntity = new VaultsEntity();
+		UserVaultsEntity vaultsEntity = new UserVaultsEntity();
 		BeanUtils.copyProperties(vault, vaultsEntity);
 		
 		String publicVaultId = utils.generateVaultId(30);
 		vaultsEntity.setName(vault.getName());
 		vaultsEntity.setVaultId(publicVaultId);
 		vaultsEntity.setUserDetails(user);
+		vaultsEntity.setBalance(0.00);
 		
 		return saveAndReturnStoredVaultDetails(vaultsEntity);
 	}
@@ -50,9 +51,9 @@ public class VaultsServiceImpl implements VaultsService {
 		List<UserVaultsDto> returnValue = new ArrayList<>();
 		ModelMapper modelMapper = new ModelMapper();
 		
-		Iterable<VaultsEntity> vaults = vaultsRepository.findAllByUserDetails(user);
+		Iterable<UserVaultsEntity> vaults = vaultsRepository.findAllByUserDetails(user);
 		
-		for (VaultsEntity vaultsEntity : vaults) {
+		for (UserVaultsEntity vaultsEntity : vaults) {
 			returnValue.add(modelMapper.map(vaultsEntity, UserVaultsDto.class));
 		}
 		
@@ -61,7 +62,7 @@ public class VaultsServiceImpl implements VaultsService {
 
 	@Override
 	public UserVaultsDto getVault(String vaultId) {
-		VaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
+		UserVaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
 		
 		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
@@ -70,7 +71,7 @@ public class VaultsServiceImpl implements VaultsService {
 
 	@Override
 	public UserVaultsDto updateVault(String vaultId, UserVaultsDto vaultDetails) {
-		VaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
+		UserVaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
 		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		vault.setName(vaultDetails.getName());
@@ -80,18 +81,18 @@ public class VaultsServiceImpl implements VaultsService {
 
 	@Override
 	public void deleteVault(String vaultId) {
-		VaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
+		UserVaultsEntity vault = vaultsRepository.findByVaultId(vaultId);
 		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		vaultsRepository.delete(vault);
 	}
 
-	private UserVaultsDto saveAndReturnStoredVaultDetails(VaultsEntity vault) {
-		VaultsEntity storedVaultDetails = vaultsRepository.save(vault);
+	private UserVaultsDto saveAndReturnStoredVaultDetails(UserVaultsEntity vault) {
+		UserVaultsEntity storedVaultDetails = vaultsRepository.save(vault);
 		return mapVaultsEntityToVaultsDto(storedVaultDetails);
 	}
 	
-	private UserVaultsDto mapVaultsEntityToVaultsDto(VaultsEntity vault) {
+	private UserVaultsDto mapVaultsEntityToVaultsDto(UserVaultsEntity vault) {
 		UserVaultsDto returnValue = new UserVaultsDto();
 		BeanUtils.copyProperties(vault, returnValue);
 		return returnValue;

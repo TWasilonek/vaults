@@ -6,10 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
-import com.tomaszwasilonek.vaults.ws.io.entity.VaultsEntity;
+import com.tomaszwasilonek.vaults.ws.io.entity.UserVaultsEntity;
 
 @Repository
-public interface VaultsRepository extends CrudRepository<VaultsEntity, Long> {
-	List<VaultsEntity> findAllByUserDetails(UserEntity userEntity);
-	VaultsEntity findByVaultId(String vaultId);
+public interface VaultsRepository extends CrudRepository<UserVaultsEntity, Long> {
+	List<UserVaultsEntity> findAllByUserDetails(UserEntity userEntity);
+	UserVaultsEntity findByVaultId(String vaultId);
 }

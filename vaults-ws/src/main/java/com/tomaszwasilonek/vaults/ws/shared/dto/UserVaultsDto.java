@@ -7,7 +7,8 @@ public class UserVaultsDto implements Serializable {
 	private long id;
 	private String vaultId;
 	private String name;
-
+	private double balance;
+	
 	public long getId() {
 		return id;
 	}
@@ -30,6 +31,14 @@ public class UserVaultsDto implements Serializable {
 
 	public void setVaultId(String vaultId) {
 		this.vaultId = vaultId;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
 	}
 	
 	

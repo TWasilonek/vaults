@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
@@ -71,7 +72,7 @@ public class UserController {
 
 		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
 				|| userDetails.getEmail().isEmpty() || userDetails.getPassword().isEmpty()) {
-			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
 		UserDto userDto = new UserDto();
@@ -92,7 +93,7 @@ public class UserController {
 
 		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
 				|| userDetails.getEmail().isEmpty()) {
-			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
 		UserDto userDto = new UserDto();
@@ -118,10 +119,13 @@ public class UserController {
 	@PostMapping(path = "/{userId}/vaults",
 			consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE },
 			produces = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE })
-	public UserVaultsRest createUserVault(
+	public UserVaultsRest createVault(
 			@PathVariable String userId,
 			@RequestBody VaultsDetailsRequestModel vaultDetails) {
-		// TODO: implement required fields for a new Vault
+		
+		if (vaultDetails.getName().isEmpty()) {
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
 		
 		UserVaultsRest returnValue = new UserVaultsRest();
 

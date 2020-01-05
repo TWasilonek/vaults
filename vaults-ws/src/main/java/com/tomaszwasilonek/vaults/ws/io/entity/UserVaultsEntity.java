@@ -11,7 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity(name="vaults")
-public class VaultsEntity implements Serializable {
+public class UserVaultsEntity implements Serializable {
 
 	private static final long serialVersionUID = 2278145604595676191L;
 
@@ -24,6 +24,9 @@ public class VaultsEntity implements Serializable {
 	
 	@Column(nullable=false)
 	private String vaultId;
+	
+	@Column(nullable=false)
+	private double balance;
 	
 	@ManyToOne
 	@JoinColumn(name="users_id")
@@ -60,5 +63,15 @@ public class VaultsEntity implements Serializable {
 	public void setUserDetails(UserEntity userDetails) {
 		this.userDetails = userDetails;
 	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+	
+	
 
 }

@@ -41,7 +41,7 @@ public class UserEntity implements Serializable {
 
 	// TODO is it needed?
 	@OneToMany(mappedBy="userDetails", cascade=CascadeType.ALL)
-	private List<VaultsEntity> vaults;
+	private List<UserVaultsEntity> vaults;
 	
 	public long getId() {
 		return id;

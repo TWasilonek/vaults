@@ -11,14 +11,14 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
 
-import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
-import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
+import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.service.impl.UserServiceImpl;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
@@ -108,16 +108,16 @@ class UserControllerTest {
 
 	@Test
 	void testCreateUser_missingRequiredFields() {
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			userController.createUser(new UserDetailsRequestModel("", LAST_NAME, EMAIL, RAW_PASSWORD));
 		});
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, "", EMAIL, RAW_PASSWORD));
 		});
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, LAST_NAME, "", RAW_PASSWORD));
 		});
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, LAST_NAME, EMAIL, ""));
 		});
 	}
@@ -149,7 +149,7 @@ class UserControllerTest {
 	
 	@Test
 	void testUpdateUser_missingRequiredFields() {
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("");
 			userDetails.setLastName("ChangedLastName");
@@ -158,7 +158,7 @@ class UserControllerTest {
 			userController.updateUser(USER_ID, userDetails);
 		});
 		
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("ChangedFirstName");
 			userDetails.setLastName("");
@@ -167,7 +167,7 @@ class UserControllerTest {
 			userController.updateUser(USER_ID, userDetails);
 		});
 		
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(MissingRequiredFieldsException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("ChangedFirstName");
 			userDetails.setLastName("ChangedLastName");
@@ -186,51 +186,100 @@ class UserControllerTest {
 		verify(userService, times(1)).deleteUser(anyString());
 	}
 	
-	@Test
-	void testCreateVaults() {
-		UserVaultsDto newVault = new UserVaultsDto();
-		newVault.setName("VaultName");
-		
-		when(userService.createVault(anyString(), any(UserVaultsDto.class))).thenReturn(newVault);
-		
-		VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
-		UserVaultsRest userVaultsRest = userController.createUserVault(USER_ID, vaultDetails);
-		
-		assertNotNull(userVaultsRest);
-		assertEquals("VaultName", userVaultsRest.getName());
-		assertEquals(0.00, userVaultsRest.getBalance());
-		verify(userService, times(1)).createVault(anyString(), any(UserVaultsDto.class));
-	}
 	
-	@Test
-	void testCreateVaults_missingRequiredFields() {
-		// TODO: change to a new exception type UserControllerException, 
-		// and replace all exceptions in the UserController
-		assertThrows(VaultsServiceException.class, () -> {
-			VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
-			vaultDetails.setName("");
+	
+	@Nested
+	class UserVaultsTest {
+		
+		UserVaultsDto vaultDetails;
+		
+		final String VAULT_NAME = "VaultName";
+		final String VAULT_ID = "2";
+		
+		@BeforeEach
+		void setUp() {
+			vaultDetails = new UserVaultsDto();
+			vaultDetails.setName(VAULT_NAME);
+			vaultDetails.setVaultId(VAULT_ID);
+		}
+		
+		@Test
+		void testCreateVault() {		
+			when(userService.createVault(anyString(), any(UserVaultsDto.class))).thenReturn(vaultDetails);
 			
-			userController.createUserVault(USER_ID, vaultDetails);
-		});
-	}
-	
-	@Test
-	void testGetVaults() {
-//		fail("not implemented");
-	}
-	
-	@Test
-	void testGetVault() {
-		// TODO
-	}
-	
-	@Test
-	void testUpdateVault() {
-		// TODO
-	}
-	
-	@Test
-	void testDeleteVault() {
-		// TODO
+			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
+			vaultDetailsRequestModel.setName(VAULT_NAME);
+			
+			UserVaultsRest userVaultsRest = userController.createVault(USER_ID, vaultDetailsRequestModel);
+			
+			assertNotNull(userVaultsRest);
+			assertEquals(vaultDetails.getName(), userVaultsRest.getName());
+			assertEquals(vaultDetails.getBalance(), userVaultsRest.getBalance());
+			verify(userService, times(1)).createVault(anyString(), any(UserVaultsDto.class));
+		}
+		
+		@Test
+		void testCreateUserVault_missingRequiredFields() {
+			assertThrows(MissingRequiredFieldsException.class, () -> {
+				VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+				vaultDetails.setName("");
+				
+				userController.createVault(USER_ID, vaultDetails);
+			});
+		}
+		
+		@Test
+		void testGetVaults() {
+			List<UserVaultsDto> mockVaults = new ArrayList<>();
+			mockVaults.add(new UserVaultsDto());
+			mockVaults.add(new UserVaultsDto());
+			
+			when(userService.getVaults(anyString())).thenReturn(mockVaults);
+			
+			List<UserVaultsRest> userVaults = userController.getVaults(USER_ID);
+			
+			assertEquals(2, userVaults.size());
+			verify(userService, times(1)).getVaults(anyString());
+		}
+		
+		@Test
+		void testGetVault() {
+			when(userService.getVaultByVaultId(anyString(), anyString())).thenReturn(vaultDetails);
+			
+			UserVaultsRest userVaultRest = userController.getVault(USER_ID, VAULT_ID);
+			
+			assertNotNull(userVaultRest);
+			assertEquals(vaultDetails.getName(), userVaultRest.getName());
+			verify(userService, times(1)).getVaultByVaultId(anyString(), anyString());
+		}
+		
+		@Test
+		void testUpdateVault() {
+			UserVaultsDto udpdatedVault = new UserVaultsDto();
+			BeanUtils.copyProperties(vaultDetails, udpdatedVault);
+			udpdatedVault.setName("Changed Name");
+			
+			when(userService.updateVault(anyString(), anyString(), any(UserVaultsDto.class))).thenReturn(udpdatedVault);
+			
+			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
+			vaultDetailsRequestModel.setName("Changed Name");
+			
+			assertDoesNotThrow(() -> {
+				UserVaultsRest userVaultRest = userController.updateVault(USER_ID, VAULT_ID, vaultDetailsRequestModel);
+				assertNotNull(userVaultRest);
+				assertEquals("Changed Name", userVaultRest.getName());
+				verify(userService, times(1)).updateVault(anyString(), anyString(), any(UserVaultsDto.class));
+			});
+			
+		}
+		
+		@Test
+		void testDeleteVault() {
+			OperationStatusModel response = userController.deleteVault(USER_ID, VAULT_ID);
+			assertNotNull(response);
+			assertEquals(RequestOperationName.DELETE.name(), response.getOperationName());
+			assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
+			verify(userService, times(1)).deleteVault(anyString(), anyString());
+		}
 	}
 }
