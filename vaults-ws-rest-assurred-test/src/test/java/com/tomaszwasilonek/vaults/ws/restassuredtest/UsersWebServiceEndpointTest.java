@@ -1,22 +1,22 @@
 package com.tomaszwasilonek.vaults.ws.restassuredtest;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static io.restassured.RestAssured.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 
-import groovy.json.JsonException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
-class TestCreateUser {
+@TestMethodOrder(OrderAnnotation.class)
+class UsersWebServiceEndpointTest {
 	
 	private final String CONTEXT_PATH = "/rest/v1";
 	
@@ -30,14 +30,17 @@ class TestCreateUser {
 	private final String LAST_NAME = "User";
 	private final String EMAIL = "rau@test.pl";
 	private final String PASSWORD = "1234";
+	
+	private final String JSON = "application/json";
 
 	@BeforeEach
 	void setUp() throws Exception {
 		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = 8888;
 	}
-
+	
 	@Test
+	@Order(1)
 	void testCreateUser() {
 		Map<String, Object> userDetails = new HashMap<>();
 		userDetails.put(FIRST_NAME_KEY, FIRST_NAME);
@@ -46,14 +49,14 @@ class TestCreateUser {
 		userDetails.put(PASSWORD_KEY, PASSWORD);
 			
 		Response response = given().
-			contentType("application/json").
-			accept("application/json").
+			contentType(JSON).
+			accept(JSON).
 			body(userDetails).
 		when().
 			post(CONTEXT_PATH + "/users").
 		then().
 			statusCode(200).
-			contentType("application/json").
+			contentType(JSON).
 			extract().
 			response();
 		
@@ -70,6 +73,44 @@ class TestCreateUser {
 		assertEquals(EMAIL, email);
 	}
 	
-	// TODO: test failing CreateUser when user already exists (send request again after creating a user successfully)
+	@Test
+	@Order(2)
+	void testCreateUser_failingWhenUserAlreadyExists() {
+		Map<String, Object> userDetails = new HashMap<>();
+		userDetails.put(FIRST_NAME_KEY, FIRST_NAME);
+		userDetails.put(LAST_NAME_KEY, LAST_NAME);
+		userDetails.put(EMAIL_KEY, EMAIL);
+		userDetails.put(PASSWORD_KEY, PASSWORD);
+			
+		given().
+			contentType(JSON).
+			accept(JSON).
+			body(userDetails).
+		when().
+			post(CONTEXT_PATH + "/users").
+		then().
+			statusCode(500);
+	}
+	
+	@Test
+	@Order(3)
+	void testUserLogin() {
+		Map<String, Object> userDetails = new HashMap<>();
+		userDetails.put(EMAIL_KEY, EMAIL);
+		userDetails.put(PASSWORD_KEY, PASSWORD);
+		
+		Response response = given().
+			contentType(JSON).
+			accept(JSON).
+			body(userDetails).
+		when().
+			post(CONTEXT_PATH + "/users/login").
+		then().
+			statusCode(200).
+			extract().response();
+		
+		assertNotNull(response.header("Authorization"));
+		assertNotNull(response.header("UserID"));
+	}
 
 }
