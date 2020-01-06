@@ -6,6 +6,8 @@ import static io.restassured.RestAssured.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -31,7 +33,16 @@ class UsersWebServiceEndpointTest {
 	private final String EMAIL = "rau@test.pl";
 	private final String PASSWORD = "1234";
 	
+	private final String VAULT_NAME_KEY = "name";
+	private final String VAULT_BALANCE_KEY = "balance";
+	private final String VAULT_ID_KEY = "vaultId";
+	private final String VAULT_NAME = "Vault1";
+	
 	private final String JSON = "application/json";
+	
+	private static String authorizationHeader;
+	private static String userId;
+	private static String vaultId;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -49,28 +60,21 @@ class UsersWebServiceEndpointTest {
 		userDetails.put(PASSWORD_KEY, PASSWORD);
 			
 		Response response = given().
-			contentType(JSON).
-			accept(JSON).
-			body(userDetails).
-		when().
-			post(CONTEXT_PATH + "/users").
-		then().
-			statusCode(200).
-			contentType(JSON).
-			extract().
-			response();
-		
-		String userId = response.jsonPath().getString(USER_ID_KEY);
-		assertNotNull(userId);
-		
-		String firstName = response.jsonPath().getString(FIRST_NAME_KEY);
-		assertEquals(FIRST_NAME, firstName);
-		
-		String lastName = response.jsonPath().getString(LAST_NAME_KEY);
-		assertEquals(LAST_NAME, lastName);
-		
-		String email = response.jsonPath().getString(EMAIL_KEY);
-		assertEquals(EMAIL, email);
+				contentType(JSON).
+				accept(JSON).
+				body(userDetails).
+			when().
+				post(CONTEXT_PATH + "/users").
+			then().
+				statusCode(200).
+				contentType(JSON).
+				extract().
+				response();
+
+		assertNotNull(response.jsonPath().getString(USER_ID_KEY));
+		assertEquals(FIRST_NAME, response.jsonPath().getString(FIRST_NAME_KEY));
+		assertEquals(LAST_NAME, response.jsonPath().getString(LAST_NAME_KEY));
+		assertEquals(EMAIL, response.jsonPath().getString(EMAIL_KEY));
 	}
 	
 	@Test
@@ -100,17 +104,167 @@ class UsersWebServiceEndpointTest {
 		userDetails.put(PASSWORD_KEY, PASSWORD);
 		
 		Response response = given().
+				contentType(JSON).
+				accept(JSON).
+				body(userDetails).
+			when().
+				post(CONTEXT_PATH + "/users/login").
+			then().
+				statusCode(200).
+				extract().response();
+		
+		authorizationHeader = response.header("Authorization");
+		userId = response.header("UserID");
+		
+		assertNotNull(authorizationHeader);
+		assertNotNull(userId);
+	}
+	
+	@Test
+	@Order(4)
+	void testGetUserDetails() {
+		Response response = given().
+				header("Authorization", authorizationHeader).
+				contentType(JSON).
+				accept(JSON).
+			when().
+				get(CONTEXT_PATH + "/users/" + userId).
+			then().
+				statusCode(200).
+				extract().response();
+		
+		assertEquals(FIRST_NAME, response.jsonPath().getString(FIRST_NAME_KEY));
+		assertEquals(LAST_NAME, response.jsonPath().getString(LAST_NAME_KEY));
+		assertEquals(EMAIL, response.jsonPath().getString(EMAIL_KEY));
+	}
+	
+	@Test
+	@Order(5)
+	void testUpdateUser() {
+		Map<String, Object> userDetails = new HashMap<>();
+		userDetails.put(FIRST_NAME_KEY, "Updated first name");
+		userDetails.put(LAST_NAME_KEY, "Updated last name");
+		userDetails.put(EMAIL_KEY, EMAIL);
+		
+		Response response = given().
+				header("Authorization", authorizationHeader).
+				contentType(JSON).
+				accept(JSON).
+				body(userDetails).
+			when().
+				put(CONTEXT_PATH + "/users/" + userId).
+			then().
+				statusCode(200).
+				extract().response();
+		
+		assertEquals("Updated first name", response.jsonPath().getString(FIRST_NAME_KEY));
+		assertEquals("Updated last name", response.jsonPath().getString(LAST_NAME_KEY));
+		assertEquals(EMAIL, response.jsonPath().getString(EMAIL_KEY));
+	}
+	
+	
+	@Test
+	@Order(100) // ensure this test runs last
+	void testDeleteUser() {
+		given().
+			header("Authorization", authorizationHeader).
 			contentType(JSON).
 			accept(JSON).
-			body(userDetails).
 		when().
-			post(CONTEXT_PATH + "/users/login").
+			delete(CONTEXT_PATH + "/users/" + userId).
 		then().
-			statusCode(200).
-			extract().response();
+			statusCode(200);
+	}
+	
+	
+	/**
+	 * Vaults related tests
+	 */
+	@Test
+	@Order(10)
+	void testCreateVault() {
+		Map<String, Object> vaultDetails = new HashMap<>();
+		vaultDetails.put(VAULT_NAME_KEY, VAULT_NAME);
 		
-		assertNotNull(response.header("Authorization"));
-		assertNotNull(response.header("UserID"));
+		Response response = given().
+				header("Authorization", authorizationHeader).
+				contentType(JSON).
+				accept(JSON).
+				body(vaultDetails).
+			when().
+				post(CONTEXT_PATH + "/users/" + userId + "/vaults").
+			then().
+				statusCode(200).
+				extract().response();
+		
+		vaultId = response.jsonPath().getString(VAULT_ID_KEY);
+		
+		assertEquals(VAULT_NAME, response.jsonPath().getString(VAULT_NAME_KEY));
+		assertEquals(0.00, response.jsonPath().getDouble(VAULT_BALANCE_KEY));
+		assertNotNull(vaultId);
+	}
+	
+	@Test
+	@Order(11)
+	void testGetVaults() {
+		Response response = given().
+				header("Authorization", authorizationHeader).
+				contentType(JSON).
+				accept(JSON).
+			when().
+				get(CONTEXT_PATH + "/users/" + userId + "/vaults").
+			then().
+				statusCode(200).
+				extract().response();
+		
+		String bodyString = response.body().asString();
+		try {
+			JSONArray vaults = new JSONArray(bodyString);
+			
+			assertNotNull(vaults);
+			assertTrue( vaults.length() == 1 );
+			
+			assertEquals(VAULT_NAME, vaults.getJSONObject(0).getString(VAULT_NAME_KEY));
+			assertEquals(0.00, vaults.getJSONObject(0).getDouble(VAULT_BALANCE_KEY));
+			assertNotNull(vaults.getJSONObject(0).getString(VAULT_ID_KEY));
+			
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	@Order(12)
+	void testUpdateVault() {
+		Map<String, Object> vaultDetails = new HashMap<>();
+		vaultDetails.put(VAULT_NAME_KEY, "Updated vault name");
+		
+		Response response = given().
+				header("Authorization", authorizationHeader).
+				contentType(JSON).
+				accept(JSON).
+				body(vaultDetails).
+			when().
+				put(CONTEXT_PATH + "/users/" + userId + "/vaults/" + vaultId).
+			then().
+				statusCode(200).
+				extract().response();
+		
+		assertEquals("Updated vault name", response.jsonPath().getString(VAULT_NAME_KEY));
+		assertEquals(0.00, response.jsonPath().getDouble(VAULT_BALANCE_KEY));
+	}
+	
+	@Test
+	@Order(19) // ensure this test runs as last of all the vaults-related tests
+	void testDeleteVault() {
+		given().
+			header("Authorization", authorizationHeader).
+			contentType(JSON).
+			accept(JSON).
+		when().
+			delete(CONTEXT_PATH + "/users/" + userId + "/vaults/" + vaultId).
+		then().
+			statusCode(200);
 	}
 
 }
