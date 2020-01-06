@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
-import com.tomaszwasilonek.vaults.ws.shared.dto.VaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
@@ -27,7 +28,7 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
-import com.tomaszwasilonek.vaults.ws.ui.model.response.VaultsRest;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultsRest;
 
 @RestController
 @RequestMapping("/users") // http://localhost:8080/rest/v1/users
@@ -63,14 +64,15 @@ public class UserController {
 		return returnValue;
 	}
 
-	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, produces = {
-			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	@PostMapping(
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
 		UserRest returnValue = new UserRest();
 
 		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
 				|| userDetails.getEmail().isEmpty() || userDetails.getPassword().isEmpty()) {
-			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
 		UserDto userDto = new UserDto();
@@ -82,16 +84,16 @@ public class UserController {
 		return returnValue;
 	}
 
-	@PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
+	@PutMapping(path = "/{id}",
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
 			throws Exception {
 		UserRest returnValue = new UserRest();
 
 		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
 				|| userDetails.getEmail().isEmpty()) {
-			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
 		UserDto userDto = new UserDto();
@@ -114,33 +116,40 @@ public class UserController {
 		return returnValue;
 	}
 
-	@PostMapping(path = "/{userId}/vaults", consumes = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
-	public VaultsRest createUserVault(@PathVariable String userId,
+	@PostMapping(path = "/{userId}/vaults",
+			consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE })
+	public UserVaultsRest createVault(
+			@PathVariable String userId,
 			@RequestBody VaultsDetailsRequestModel vaultDetails) {
-		VaultsRest returnValue = new VaultsRest();
+		
+		if (vaultDetails.getName().isEmpty()) {
+			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
+		
+		UserVaultsRest returnValue = new UserVaultsRest();
 
-		VaultsDto vaultsDto = new VaultsDto();
+		UserVaultsDto vaultsDto = new UserVaultsDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 
-		VaultsDto createdVault = userService.createVault(userId, vaultsDto);
+		UserVaultsDto createdVault = userService.createVault(userId, vaultsDto);
 		BeanUtils.copyProperties(createdVault, returnValue);
 
 		return returnValue;
 	}
 
-	@GetMapping(path = "/{id}/vaults", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public List<VaultsRest> getVaults(@PathVariable String id) {
+	@GetMapping(path = "/{userId}/vaults",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public List<UserVaultsRest> getVaults(@PathVariable String userId) {
 
-		List<VaultsRest> returnValue = new ArrayList<>();
+		List<UserVaultsRest> returnValue = new ArrayList<>();
 
-		List<VaultsDto> vaults = userService.getVaults(id);
+		List<UserVaultsDto> vaults = userService.getVaults(userId);
 
 		// TODO change to modelmapper
 		if (vaults != null && !vaults.isEmpty()) {
-			for (VaultsDto vaultsDto : vaults) {
-				VaultsRest vaultModel = new VaultsRest();
+			for (UserVaultsDto vaultsDto : vaults) {
+				UserVaultsRest vaultModel = new UserVaultsRest();
 				BeanUtils.copyProperties(vaultsDto, vaultModel);
 				returnValue.add(vaultModel);
 			}
@@ -149,35 +158,37 @@ public class UserController {
 		return returnValue;
 	}
 
-	@GetMapping(path = "/{userId}/vaults/{vaultId}", produces = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE })
-	public VaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
-		VaultsRest returnValue = new VaultsRest();
+	@GetMapping(path = "/{userId}/vaults/{vaultId}",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public UserVaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
+		UserVaultsRest returnValue = new UserVaultsRest();
 
-		VaultsDto vault = userService.getVaultByVaultId(userId, vaultId);
+		UserVaultsDto vault = userService.getVaultByVaultId(userId, vaultId);
 		BeanUtils.copyProperties(vault, returnValue);
 
 		return returnValue;
 	}
 
-	@PutMapping(path = "/{userId}/vaults/{vaultId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
-	public VaultsRest updateVault(@PathVariable String userId, @PathVariable String vaultId,
+	@PutMapping(path = "/{userId}/vaults/{vaultId}",
+			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public UserVaultsRest updateVault(
+			@PathVariable String userId,
+			@PathVariable String vaultId,
 			@RequestBody VaultsDetailsRequestModel vaultDetails) throws Exception {
-		VaultsRest returnValue = new VaultsRest();
+		UserVaultsRest returnValue = new UserVaultsRest();
 
-		VaultsDto vaultsDto = new VaultsDto();
+		UserVaultsDto vaultsDto = new UserVaultsDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 
-		VaultsDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
+		UserVaultsDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
 		BeanUtils.copyProperties(updatedVault, returnValue);
 
 		return returnValue;
 	}
 
-	@DeleteMapping(path = "/{userId}/vaults/{vaultId}", produces = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE })
+	@DeleteMapping(path = "/{userId}/vaults/{vaultId}",
+			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public OperationStatusModel deleteVault(@PathVariable String userId, @PathVariable String vaultId) {
 		OperationStatusModel returnValue = new OperationStatusModel();
 		returnValue.setOperationName(RequestOperationName.DELETE.name());

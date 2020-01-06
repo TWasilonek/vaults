@@ -1,8 +1,17 @@
 package com.tomaszwasilonek.vaults.ws.ui.model.response;
 
-public class VaultsRest {
+public class UserVaultsRest {
 	private String vaultId;
 	private String name;
+	private double balance;
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
 
 	public String getName() {
 		return name;
@@ -19,7 +28,4 @@ public class VaultsRest {
 	public void setVaultId(String vaultId) {
 		this.vaultId = vaultId;
 	}
-	
-	
-
 }
