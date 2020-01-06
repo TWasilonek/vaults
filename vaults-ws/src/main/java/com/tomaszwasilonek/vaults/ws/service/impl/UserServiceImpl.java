@@ -18,7 +18,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.io.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
-import com.tomaszwasilonek.vaults.ws.service.VaultsService;
+import com.tomaszwasilonek.vaults.ws.service.UserVaultsService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	VaultsService vaultsService;
+	UserVaultsService userVaultsService;
 
 	@Override
 	public UserDto createUser(UserDto user) {
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		UserVaultsDto createdVault = vaultsService.createVault(userEntity, vault);
+		UserVaultsDto createdVault = userVaultsService.createVault(userEntity, vault);
 		return createdVault;
 	}
 
@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		List<UserVaultsDto> returnValue = vaultsService.getVaults(userEntity);
+		List<UserVaultsDto> returnValue = userVaultsService.getVaults(userEntity);
 		return returnValue;
 	}
 
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		UserVaultsDto returnValue = vaultsService.getVault(vaultId);
+		UserVaultsDto returnValue = userVaultsService.getVault(vaultId);
 		return returnValue;
 	}
 
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		UserVaultsDto returnValue = vaultsService.updateVault(vaultId, vaultDetails);
+		UserVaultsDto returnValue = userVaultsService.updateVault(vaultId, vaultDetails);
 		return returnValue;
 	}
 
@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		vaultsService.deleteVault(vaultId);
+		userVaultsService.deleteVault(vaultId);
 	}
 
 	private UserDto saveAndReturnStoredUserDetails(UserEntity user) {

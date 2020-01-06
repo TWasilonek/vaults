@@ -9,7 +9,8 @@ import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.io.entity.UserVaultsEntity;
 
 @Repository
-public interface VaultsRepository extends CrudRepository<UserVaultsEntity, Long> {
+public interface UserVaultsRepository extends CrudRepository<UserVaultsEntity, Long> {
 	List<UserVaultsEntity> findAllByUserDetails(UserEntity userEntity);
 	UserVaultsEntity findByVaultId(String vaultId);
+	UserVaultsEntity findByName(String name);
 }
