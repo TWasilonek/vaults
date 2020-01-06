@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
-import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
@@ -31,7 +30,7 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultsRest;
 
 @RestController
-@RequestMapping("/users") // http://localhost:8080/rest/v1/users
+@RequestMapping("/users") // http://localhost:8888/rest/v1/users
 public class UserController {
 
 	@Autowired
