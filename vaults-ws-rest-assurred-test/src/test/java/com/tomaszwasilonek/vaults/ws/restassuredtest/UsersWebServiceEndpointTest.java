@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.restassured.RestAssured.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -217,20 +216,11 @@ class UsersWebServiceEndpointTest {
 				statusCode(200).
 				extract().response();
 		
-		String bodyString = response.body().asString();
-		try {
-			JSONArray vaults = new JSONArray(bodyString);
-			
-			assertNotNull(vaults);
-			assertTrue( vaults.length() == 1 );
-			
-			assertEquals(VAULT_NAME, vaults.getJSONObject(0).getString(VAULT_NAME_KEY));
-			assertEquals(0.00, vaults.getJSONObject(0).getDouble(VAULT_BALANCE_KEY));
-			assertNotNull(vaults.getJSONObject(0).getString(VAULT_ID_KEY));
-			
-		} catch (JSONException e) {
-			fail(e.getMessage());
-		}
+		List<Map<Object, Object>> vaults = response.jsonPath().getList("");
+		
+		assertNotNull(vaults);
+		assertTrue( vaults.size() == 1 );
+		assertEquals(VAULT_NAME, vaults.get(0).get(VAULT_NAME_KEY));
 	}
 	
 	@Test
@@ -255,7 +245,7 @@ class UsersWebServiceEndpointTest {
 	}
 	
 	@Test
-	@Order(19) // ensure this test runs as last of all the vaults-related tests
+	@Order(20) // ensure this test runs as last of all the vaults-related tests
 	void testDeleteVault() {
 		given().
 			header("Authorization", authorizationHeader).
