@@ -29,6 +29,9 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultsRest;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+
 @RestController
 @RequestMapping("/users") // http://localhost:8888/rest/v1/users
 public class UserController {
@@ -36,6 +39,9 @@ public class UserController {
 	@Autowired
 	UserService userService;
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
@@ -53,6 +59,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserRest getUser(@PathVariable String id) {
 		UserRest returnValue = new UserRest();
@@ -83,6 +92,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@PutMapping(path = "/{id}",
 			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
@@ -104,6 +116,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public OperationStatusModel deleteUser(@PathVariable String id) {
 		OperationStatusModel returnValue = new OperationStatusModel();
@@ -115,6 +130,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@PostMapping(path = "/{userId}/vaults",
 			consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE },
 			produces = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE })
@@ -137,6 +155,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@GetMapping(path = "/{userId}/vaults",
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public List<UserVaultsRest> getVaults(@PathVariable String userId) {
@@ -157,6 +178,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@GetMapping(path = "/{userId}/vaults/{vaultId}",
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserVaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
@@ -168,6 +192,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@PutMapping(path = "/{userId}/vaults/{vaultId}",
 			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
@@ -186,6 +213,9 @@ public class UserController {
 		return returnValue;
 	}
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="authorization", value="${authorizationHeader.description}", paramType="header")
+	})
 	@DeleteMapping(path = "/{userId}/vaults/{vaultId}",
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public OperationStatusModel deleteVault(@PathVariable String userId, @PathVariable String vaultId) {
