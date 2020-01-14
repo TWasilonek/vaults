@@ -107,7 +107,7 @@ class UsersWebServiceEndpointTest {
 				accept(JSON).
 				body(userDetails).
 			when().
-				post(CONTEXT_PATH + "/users/login").
+				post(CONTEXT_PATH + "/login").
 			then().
 				statusCode(200).
 				extract().response();

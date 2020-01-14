@@ -31,6 +31,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			// allow H2 console requests
 			.antMatchers(SecurityConstants.H2_CONSOLE)
 			.permitAll()
+			// allow Swagger paths
+			.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/v2/api-docs?group=external", "/webjars/**")
+			.permitAll()
 			// For all other requests authentication is required
 			.anyRequest().authenticated()
 			.and()
@@ -56,7 +59,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	// By default SpringSecurity sets it to "/login"
 	public AuthenticationFilter getAuthenticationFilter() throws Exception {
 		final AuthenticationFilter filter = new AuthenticationFilter(authenticationManager());
-		filter.setFilterProcessesUrl("/users/login");
+		filter.setFilterProcessesUrl("/login");
 		return filter;
 	}
 	
