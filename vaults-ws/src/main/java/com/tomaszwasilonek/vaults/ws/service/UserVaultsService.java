@@ -2,7 +2,7 @@ package com.tomaszwasilonek.vaults.ws.service;
 
 import java.util.List;
 
-import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
+import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
 
 public interface UserVaultsService {

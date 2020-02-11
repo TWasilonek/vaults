@@ -1,4 +1,4 @@
-package com.tomaszwasilonek.vaults.ws.io.entity;
+package com.tomaszwasilonek.vaults.ws.entity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,16 +7,17 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-@Entity(name="users")
+@Entity(name="user")
 public class UserEntity implements Serializable {
 
 	private static final long serialVersionUID = 956484066067704831L;
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
 	@Column(nullable=false)
@@ -41,7 +42,7 @@ public class UserEntity implements Serializable {
 
 	// TODO is it needed?
 	@OneToMany(mappedBy="userDetails", cascade=CascadeType.ALL)
-	private List<UserVaultsEntity> vaults;
+	private List<UserVault> vaults;
 	
 	public long getId() {
 		return id;
