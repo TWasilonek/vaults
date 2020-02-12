@@ -21,7 +21,7 @@ import org.springframework.beans.BeanUtils;
 import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.service.impl.UserServiceImpl;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
-import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
@@ -191,21 +191,21 @@ class UserControllerTest {
 	@Nested
 	class UserVaultsTest {
 		
-		UserVaultsDto vaultDetails;
+		UserVaultDto vaultDetails;
 		
 		final String VAULT_NAME = "VaultName";
 		final String VAULT_ID = "2";
 		
 		@BeforeEach
 		void setUp() {
-			vaultDetails = new UserVaultsDto();
+			vaultDetails = new UserVaultDto();
 			vaultDetails.setName(VAULT_NAME);
 			vaultDetails.setVaultId(VAULT_ID);
 		}
 		
 		@Test
 		void testCreateVault() {		
-			when(userService.createVault(anyString(), any(UserVaultsDto.class))).thenReturn(vaultDetails);
+			when(userService.createVault(anyString(), any(UserVaultDto.class))).thenReturn(vaultDetails);
 			
 			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
 			vaultDetailsRequestModel.setName(VAULT_NAME);
@@ -215,7 +215,7 @@ class UserControllerTest {
 			assertNotNull(userVaultsRest);
 			assertEquals(vaultDetails.getName(), userVaultsRest.getName());
 			assertEquals(vaultDetails.getBalance(), userVaultsRest.getBalance());
-			verify(userService, times(1)).createVault(anyString(), any(UserVaultsDto.class));
+			verify(userService, times(1)).createVault(anyString(), any(UserVaultDto.class));
 		}
 		
 		@Test
@@ -230,9 +230,9 @@ class UserControllerTest {
 		
 		@Test
 		void testGetVaults() {
-			List<UserVaultsDto> mockVaults = new ArrayList<>();
-			mockVaults.add(new UserVaultsDto());
-			mockVaults.add(new UserVaultsDto());
+			List<UserVaultDto> mockVaults = new ArrayList<>();
+			mockVaults.add(new UserVaultDto());
+			mockVaults.add(new UserVaultDto());
 			
 			when(userService.getVaults(anyString())).thenReturn(mockVaults);
 			
@@ -255,11 +255,11 @@ class UserControllerTest {
 		
 		@Test
 		void testUpdateVault() {
-			UserVaultsDto udpdatedVault = new UserVaultsDto();
+			UserVaultDto udpdatedVault = new UserVaultDto();
 			BeanUtils.copyProperties(vaultDetails, udpdatedVault);
 			udpdatedVault.setName("Changed Name");
 			
-			when(userService.updateVault(anyString(), anyString(), any(UserVaultsDto.class))).thenReturn(udpdatedVault);
+			when(userService.updateVault(anyString(), anyString(), any(UserVaultDto.class))).thenReturn(udpdatedVault);
 			
 			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
 			vaultDetailsRequestModel.setName("Changed Name");
@@ -268,7 +268,7 @@ class UserControllerTest {
 				UserVaultsRest userVaultRest = userController.updateVault(USER_ID, VAULT_ID, vaultDetailsRequestModel);
 				assertNotNull(userVaultRest);
 				assertEquals("Changed Name", userVaultRest.getName());
-				verify(userService, times(1)).updateVault(anyString(), anyString(), any(UserVaultsDto.class));
+				verify(userService, times(1)).updateVault(anyString(), anyString(), any(UserVaultDto.class));
 			});
 			
 		}

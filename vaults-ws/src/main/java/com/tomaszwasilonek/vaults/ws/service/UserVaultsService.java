@@ -3,16 +3,16 @@ package com.tomaszwasilonek.vaults.ws.service;
 import java.util.List;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
-import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 public interface UserVaultsService {
-	UserVaultsDto createVault(UserEntity user, UserVaultsDto vault);
+	UserVaultDto createVault(UserEntity user, UserVaultDto vault);
 	
-	List<UserVaultsDto> getVaults(UserEntity user);
+	List<UserVaultDto> getVaults(UserEntity user);
 	
-	UserVaultsDto getVault(String vaultId);
+	UserVaultDto getVault(String vaultId);
 	
-	UserVaultsDto updateVault(String vaultId, UserVaultsDto vaultDetails);
+	UserVaultDto updateVault(String vaultId, UserVaultDto vaultDetails);
 	
 	void deleteVault(String vaultId);
 }

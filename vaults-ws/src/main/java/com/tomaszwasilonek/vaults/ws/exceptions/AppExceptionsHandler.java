@@ -4,16 +4,9 @@
 
 package com.tomaszwasilonek.vaults.ws.exceptions;
 
-import java.util.Date;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
-import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessage;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.ApiError;
 
 @ControllerAdvice
 public class AppExceptionsHandler {

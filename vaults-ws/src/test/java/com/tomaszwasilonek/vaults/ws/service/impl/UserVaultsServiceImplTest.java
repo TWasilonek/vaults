@@ -23,7 +23,7 @@ import com.tomaszwasilonek.vaults.ws.entity.UserVault;
 import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 class UserVaultsServiceImplTest {
 	
@@ -57,7 +57,7 @@ class UserVaultsServiceImplTest {
 		when(utils.generateVaultId(anyInt())).thenReturn(VAULT_ID);
 		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(userVaultsEntity);
 		
-		UserVaultsDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultsDto());
+		UserVaultDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultDto());
 	
 		assertNotNull(storedVault);
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
@@ -69,7 +69,7 @@ class UserVaultsServiceImplTest {
 
 	@Test
 	void testCreateVault_duplicateName() {
-		UserVaultsDto userVaultsDto = new UserVaultsDto();
+		UserVaultDto userVaultsDto = new UserVaultDto();
 		userVaultsDto.setName("Duplicated name");
 		
 		when(userVaultsRepository.findByName(anyString())).thenReturn(new UserVault());
@@ -87,7 +87,7 @@ class UserVaultsServiceImplTest {
 		
 		when(userVaultsRepository.findAllByUserDetails(any(UserEntity.class))).thenReturn(vaults);
 		
-		List<UserVaultsDto> storedVaults = userVaultsService.getVaults(new UserEntity());
+		List<UserVaultDto> storedVaults = userVaultsService.getVaults(new UserEntity());
 		
 		assertNotNull(storedVaults);
 		assertEquals(2, storedVaults.size());
@@ -98,7 +98,7 @@ class UserVaultsServiceImplTest {
 	void testGetVault() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(userVaultsEntity);
 		
-		UserVaultsDto storedVault = userVaultsService.getVault(VAULT_ID);
+		UserVaultDto storedVault = userVaultsService.getVault(VAULT_ID);
 		
 		assertNotNull(storedVault);
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
@@ -126,7 +126,7 @@ class UserVaultsServiceImplTest {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(userVaultsEntity);
 		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(newUserVaultsEntity);
 		
-		UserVaultsDto updatedVault = userVaultsService.updateVault(VAULT_ID, new UserVaultsDto());
+		UserVaultDto updatedVault = userVaultsService.updateVault(VAULT_ID, new UserVaultDto());
 		
 		assertNotNull(updatedVault);
 		assertEquals("Test", updatedVault.getName());
@@ -140,7 +140,7 @@ class UserVaultsServiceImplTest {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
 		assertThrows(VaultsServiceException.class, () -> {
-			userVaultsService.updateVault(VAULT_ID, new UserVaultsDto());
+			userVaultsService.updateVault(VAULT_ID, new UserVaultDto());
 		});
 	}
 

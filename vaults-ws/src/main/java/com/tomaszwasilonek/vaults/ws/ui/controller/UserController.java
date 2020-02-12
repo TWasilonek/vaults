@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
-import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
@@ -146,10 +146,10 @@ public class UserController {
 		
 		UserVaultsRest returnValue = new UserVaultsRest();
 
-		UserVaultsDto vaultsDto = new UserVaultsDto();
+		UserVaultDto vaultsDto = new UserVaultDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 
-		UserVaultsDto createdVault = userService.createVault(userId, vaultsDto);
+		UserVaultDto createdVault = userService.createVault(userId, vaultsDto);
 		BeanUtils.copyProperties(createdVault, returnValue);
 
 		return returnValue;
@@ -164,11 +164,11 @@ public class UserController {
 
 		List<UserVaultsRest> returnValue = new ArrayList<>();
 
-		List<UserVaultsDto> vaults = userService.getVaults(userId);
+		List<UserVaultDto> vaults = userService.getVaults(userId);
 
 		// TODO change to modelmapper
 		if (vaults != null && !vaults.isEmpty()) {
-			for (UserVaultsDto vaultsDto : vaults) {
+			for (UserVaultDto vaultsDto : vaults) {
 				UserVaultsRest vaultModel = new UserVaultsRest();
 				BeanUtils.copyProperties(vaultsDto, vaultModel);
 				returnValue.add(vaultModel);
@@ -186,7 +186,7 @@ public class UserController {
 	public UserVaultsRest getVault(@PathVariable String userId, @PathVariable String vaultId) {
 		UserVaultsRest returnValue = new UserVaultsRest();
 
-		UserVaultsDto vault = userService.getVaultByVaultId(userId, vaultId);
+		UserVaultDto vault = userService.getVaultByVaultId(userId, vaultId);
 		BeanUtils.copyProperties(vault, returnValue);
 
 		return returnValue;
@@ -204,10 +204,10 @@ public class UserController {
 			@RequestBody VaultsDetailsRequestModel vaultDetails) throws Exception {
 		UserVaultsRest returnValue = new UserVaultsRest();
 
-		UserVaultsDto vaultsDto = new UserVaultsDto();
+		UserVaultDto vaultsDto = new UserVaultDto();
 		BeanUtils.copyProperties(vaultDetails, vaultsDto);
 
-		UserVaultsDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
+		UserVaultDto updatedVault = userService.updateVault(userId, vaultId, vaultsDto);
 		BeanUtils.copyProperties(updatedVault, returnValue);
 
 		return returnValue;
