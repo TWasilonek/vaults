@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
+import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
@@ -60,8 +61,9 @@ public class UserServiceImpl implements UserService {
 
 		UserEntity userEntity = userRepository.findByUserId(userId);
 
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			 throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
 		userEntity.setFirstName(user.getFirstName());
 		userEntity.setLastName(user.getLastName());

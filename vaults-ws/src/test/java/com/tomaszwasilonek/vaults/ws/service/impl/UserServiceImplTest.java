@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
+import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
@@ -148,7 +149,7 @@ class UserServiceImplTest {
 	final void testUpdateUser_UserNotFoundException() {
 		when(userRepository.findByUserId(anyString())).thenReturn(null);
 		
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userService.updateUser(USER_ID, new UserDto());
 		});
 	}
