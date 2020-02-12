@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
@@ -83,13 +84,55 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	final void testGetUser_UserNotFoundException() {
+	final void testGetUser_EntityNotFoundException() {
 		when(userRepository.findByEmail(anyString())).thenReturn(null);
 		
-		assertThrows(UserServiceException.class, () -> {
-			userService.getUser(EMAIL);
+		assertThrows(EntityNotFoundException.class, () -> {
+			userService.getUser("test@test.com");
 		});
 	}
+	
+	@Test
+	final void testGetUserByUserId() {
+		when(userRepository.findByUserId(anyString())).thenReturn(userEntity);
+		
+		UserDto userDto = userService.getUserByUserId("testId");
+		
+		assertNotNull(userDto);
+		assertEquals(userEntity.getFirstName(), userDto.getFirstName());
+		assertEquals(userEntity.getLastName(), userDto.getLastName());
+		assertEquals(userEntity.getEmail(), userDto.getEmail());
+	}
+	
+	@Test
+	final void testGetUserByUserId_EntityNotFoundException() {
+		when(userRepository.findByUserId(anyString())).thenReturn(null);
+		
+		assertThrows(EntityNotFoundException.class, () -> {
+			userService.getUserByUserId("testId");
+		});
+	}
+	
+	@Test
+	final void testLoadUserByUsername() {
+		when(userRepository.findByEmail(anyString())).thenReturn(userEntity);
+		
+		UserDetails userDetails = userService.loadUserByUsername("test");
+		
+		assertNotNull(userDetails);
+		assertEquals(userEntity.getEmail(), userDetails.getUsername());
+		assertEquals(userEntity.getEncryptedPassword(), userDetails.getPassword());
+	}
+	
+	@Test
+	final void testLoadUserByUsername_EntityNotFoundException() {
+		when(userRepository.findByEmail(anyString())).thenReturn(null);
+		
+		assertThrows(EntityNotFoundException.class, () -> {
+			userService.loadUserByUsername("test");
+		});
+	}
+	
 	
 	@Test
 	final void testCreateUser() {
@@ -146,7 +189,7 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	final void testUpdateUser_UserNotFoundException() {
+	final void testUpdateUser_EntityNotFoundException() {
 		when(userRepository.findByUserId(anyString())).thenReturn(null);
 		
 		assertThrows(EntityNotFoundException.class, () -> {
@@ -166,10 +209,10 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	final void testDeleteUser_UserNotFoundException() {
+	final void testDeleteUser_EntityNotFoundException() {
 		when(userRepository.findByUserId(anyString())).thenReturn(null);
 		
-		assertThrows(UserServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userService.deleteUser(USER_ID);
 		});
 	}

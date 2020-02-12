@@ -75,8 +75,9 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
 		userRepository.delete(userEntity);
 	}
@@ -107,8 +108,9 @@ public class UserServiceImpl implements UserService {
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		UserEntity userEntity = userRepository.findByEmail(email);
 
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "email", email);
+		}
 
 		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
@@ -117,8 +119,9 @@ public class UserServiceImpl implements UserService {
 	public UserDto getUser(String email) {
 		UserEntity userEntity = userRepository.findByEmail(email);
 
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "email", email);
+		}
 
 		return mapUserEntityToUserDto(userEntity);
 	}
@@ -127,8 +130,9 @@ public class UserServiceImpl implements UserService {
 	public UserDto getUserByUserId(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
 		return mapUserEntityToUserDto(userEntity);
 	}
@@ -136,6 +140,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserVaultDto createVault(String userId, UserVaultDto vault) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
+		
 		if (userEntity == null)
 			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
