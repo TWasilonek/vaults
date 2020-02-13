@@ -16,14 +16,13 @@ import org.springframework.stereotype.Service;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
-import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
+import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
-import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,8 +42,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDto createUser(UserDto user) {
 
-		if (userRepository.findByEmail(user.getEmail()) != null)
-			throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+		if (userRepository.findByEmail(user.getEmail()) != null) {
+			throw new RecordAlreadyExistsException(UserEntity.class, "email", user.getEmail());
+		}
 
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(user, userEntity);

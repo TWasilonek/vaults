@@ -24,7 +24,7 @@ import org.springframework.beans.BeanUtils;
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
 import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
-import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
+import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
@@ -78,7 +78,7 @@ class UserVaultServiceImplTest {
 		
 		when(userVaultsRepository.findByName(anyString())).thenReturn(new UserVault());
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(RecordAlreadyExistsException.class, () -> {
 			userVaultsService.createVault(new UserEntity(), userVaultsDto);
 		});
 	}

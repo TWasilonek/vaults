@@ -92,7 +92,7 @@ class UsersWebServiceEndpointTest {
 		when().
 			post(CONTEXT_PATH + "/users").
 		then().
-			statusCode(500);
+			statusCode(400);
 	}
 	
 	@Test
@@ -174,7 +174,6 @@ class UsersWebServiceEndpointTest {
 		then().
 			statusCode(200);
 	}
-	
 	
 	/**
 	 * Vaults related tests
