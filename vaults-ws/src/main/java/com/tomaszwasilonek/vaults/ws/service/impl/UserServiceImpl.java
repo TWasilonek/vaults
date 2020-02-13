@@ -19,7 +19,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.UserServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
-import com.tomaszwasilonek.vaults.ws.service.UserVaultsService;
+import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	UserVaultsService userVaultsService;
+	UserVaultService userVaultService;
 
 	@Override
 	public UserDto createUser(UserDto user) {
@@ -141,50 +141,60 @@ public class UserServiceImpl implements UserService {
 	public UserVaultDto createVault(String userId, UserVaultDto vault) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
-		UserVaultDto createdVault = userVaultsService.createVault(userEntity, vault);
+		UserVaultDto createdVault = userVaultService.createVault(userEntity, vault);
+		System.out.println("Vault " + createdVault);
 		return createdVault;
 	}
 
 	@Override
 	public List<UserVaultDto> getVaults(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
-		List<UserVaultDto> returnValue = userVaultsService.getVaults(userEntity);
+		List<UserVaultDto> returnValue = userVaultService.getVaults(userEntity);
 		return returnValue;
 	}
 
 	@Override
 	public UserVaultDto getVaultByVaultId(String userId, String vaultId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
-		UserVaultDto returnValue = userVaultsService.getVault(vaultId);
+		UserVaultDto returnValue = userVaultService.getVault(vaultId);
 		return returnValue;
 	}
 
 	@Override
 	public UserVaultDto updateVault(String userId, String vaultId, UserVaultDto vaultDetails) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
-		UserVaultDto returnValue = userVaultsService.updateVault(vaultId, vaultDetails);
+		UserVaultDto returnValue = userVaultService.updateVault(vaultId, vaultDetails);
 		return returnValue;
 	}
 
 	@Override
 	public void deleteVault(String userId, String vaultId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
-		if (userEntity == null)
-			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (userEntity == null) {
+			throw new EntityNotFoundException(UserEntity.class, "id", userId);
+		}
 
-		userVaultsService.deleteVault(vaultId);
+		userVaultService.deleteVault(vaultId);
 	}
 
 	private UserDto saveAndReturnStoredUserDetails(UserEntity user) {

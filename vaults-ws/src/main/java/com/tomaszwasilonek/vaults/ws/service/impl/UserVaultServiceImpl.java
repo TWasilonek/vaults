@@ -10,15 +10,16 @@ import org.springframework.stereotype.Component;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
-import com.tomaszwasilonek.vaults.ws.service.UserVaultsService;
+import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 
 @Component
-public class UserVaultsServiceImpl implements UserVaultsService {
+public class UserVaultServiceImpl implements UserVaultService {
 	
 	@Autowired
 	UserVaultRepository userVaultsRepository;
@@ -64,7 +65,9 @@ public class UserVaultsServiceImpl implements UserVaultsService {
 	public UserVaultDto getVault(String vaultId) {
 		UserVault vault = userVaultsRepository.findByVaultId(vaultId);
 		
-		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (vault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", vaultId);
+		}
 		
 		return mapVaultsEntityToVaultsDto(vault);
 	}
@@ -72,7 +75,10 @@ public class UserVaultsServiceImpl implements UserVaultsService {
 	@Override
 	public UserVaultDto updateVault(String vaultId, UserVaultDto vaultDetails) {
 		UserVault vault = userVaultsRepository.findByVaultId(vaultId);
-		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (vault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", vaultId);
+		}
 		
 		vault.setName(vaultDetails.getName());
 		
@@ -82,7 +88,10 @@ public class UserVaultsServiceImpl implements UserVaultsService {
 	@Override
 	public void deleteVault(String vaultId) {
 		UserVault vault = userVaultsRepository.findByVaultId(vaultId);
-		if (vault == null) throw new VaultsServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		if (vault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", vaultId);
+		}
 		
 		userVaultsRepository.delete(vault);
 	}

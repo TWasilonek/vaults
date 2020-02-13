@@ -1,6 +1,9 @@
 package com.tomaszwasilonek.vaults.ws.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,15 +23,16 @@ import org.springframework.beans.BeanUtils;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
-class UserVaultsServiceImplTest {
+class UserVaultServiceImplTest {
 	
 	@InjectMocks
-	UserVaultsServiceImpl userVaultsService;
+	UserVaultServiceImpl userVaultsService;
 	
 	@Mock
 	UserVaultRepository userVaultsRepository;
@@ -111,7 +115,7 @@ class UserVaultsServiceImplTest {
 	void testGetVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userVaultsService.getVault(VAULT_ID);
 		});
 	}
@@ -139,7 +143,7 @@ class UserVaultsServiceImplTest {
 	void testUpdateVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userVaultsService.updateVault(VAULT_ID, new UserVaultDto());
 		});
 	}
@@ -158,7 +162,7 @@ class UserVaultsServiceImplTest {
 	void testDeleteVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userVaultsService.deleteVault(VAULT_ID);
 		});
 	}
