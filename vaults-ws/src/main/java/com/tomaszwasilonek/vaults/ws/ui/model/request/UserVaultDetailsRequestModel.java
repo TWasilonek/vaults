@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class VaultsDetailsRequestModel {
+public class UserVaultDetailsRequestModel {
 	
 	@NotBlank
 	private String name;

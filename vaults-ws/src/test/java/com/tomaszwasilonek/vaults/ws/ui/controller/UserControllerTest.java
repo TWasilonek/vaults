@@ -27,12 +27,12 @@ import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.SignUpRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
-import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.UserVaultDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
-import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultsRest;
+import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultRest;
 
 class UserControllerTest {
 
@@ -211,10 +211,10 @@ class UserControllerTest {
 		void testCreateVault() {		
 			when(userService.createVault(anyString(), any(UserVaultDto.class))).thenReturn(vaultDetails);
 			
-			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
+			UserVaultDetailsRequestModel vaultDetailsRequestModel = new UserVaultDetailsRequestModel();
 			vaultDetailsRequestModel.setName(VAULT_NAME);
 			
-			UserVaultsRest userVaultsRest = userController.createVault(USER_ID, vaultDetailsRequestModel);
+			UserVaultRest userVaultsRest = userController.createVault(USER_ID, vaultDetailsRequestModel);
 			
 			assertNotNull(userVaultsRest);
 			assertEquals(vaultDetails.getName(), userVaultsRest.getName());
@@ -225,7 +225,7 @@ class UserControllerTest {
 		@Test
 		void testCreateUserVault_missingRequiredFields() {
 			assertThrows(IllegalArgumentException.class, () -> {
-				VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+				UserVaultDetailsRequestModel vaultDetails = new UserVaultDetailsRequestModel();
 				vaultDetails.setName("");
 				
 				userController.createVault(USER_ID, vaultDetails);
@@ -240,7 +240,7 @@ class UserControllerTest {
 			
 			when(userService.getVaults(anyString())).thenReturn(mockVaults);
 			
-			List<UserVaultsRest> userVaults = userController.getVaults(USER_ID);
+			List<UserVaultRest> userVaults = userController.getVaults(USER_ID);
 			
 			assertEquals(2, userVaults.size());
 			verify(userService, times(1)).getVaults(anyString());
@@ -250,7 +250,7 @@ class UserControllerTest {
 		void testGetVault() {
 			when(userService.getVaultByVaultId(anyString(), anyString())).thenReturn(vaultDetails);
 			
-			UserVaultsRest userVaultRest = userController.getVault(USER_ID, VAULT_ID);
+			UserVaultRest userVaultRest = userController.getVault(USER_ID, VAULT_ID);
 			
 			assertNotNull(userVaultRest);
 			assertEquals(vaultDetails.getName(), userVaultRest.getName());
@@ -265,11 +265,11 @@ class UserControllerTest {
 			
 			when(userService.updateVault(anyString(), anyString(), any(UserVaultDto.class))).thenReturn(udpdatedVault);
 			
-			VaultsDetailsRequestModel vaultDetailsRequestModel = new VaultsDetailsRequestModel();
+			UserVaultDetailsRequestModel vaultDetailsRequestModel = new UserVaultDetailsRequestModel();
 			vaultDetailsRequestModel.setName("Changed Name");
 			
 			assertDoesNotThrow(() -> {
-				UserVaultsRest userVaultRest = userController.updateVault(USER_ID, VAULT_ID, vaultDetailsRequestModel);
+				UserVaultRest userVaultRest = userController.updateVault(USER_ID, VAULT_ID, vaultDetailsRequestModel);
 				assertNotNull(userVaultRest);
 				assertEquals("Changed Name", userVaultRest.getName());
 				verify(userService, times(1)).updateVault(anyString(), anyString(), any(UserVaultDto.class));
@@ -279,7 +279,7 @@ class UserControllerTest {
 		@Test
 		void testUpdateUserVault_missingRequiredFields() {
 			assertThrows(IllegalArgumentException.class, () -> {
-				VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+				UserVaultDetailsRequestModel vaultDetails = new UserVaultDetailsRequestModel();
 				vaultDetails.setName("");
 				
 				userController.updateVault(USER_ID, VAULT_ID, vaultDetails);
