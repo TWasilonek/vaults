@@ -11,10 +11,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
-public class UserVault implements Serializable {
+@EqualsAndHashCode(callSuper=false)
+public class UserVault extends AuditModel implements Serializable {
 
 	private static final long serialVersionUID = 2278145604595676191L;
 

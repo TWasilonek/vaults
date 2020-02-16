@@ -12,10 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity(name="user")
 @Data
-public class UserEntity implements Serializable {
+@EqualsAndHashCode(callSuper=false)
+public class UserEntity extends AuditModel implements Serializable {
 
 	private static final long serialVersionUID = 956484066067704831L;
 	
