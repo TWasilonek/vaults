@@ -4,12 +4,20 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-public class LoginRequestModel {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SignUpRequestModel {
+	
+	@NotBlank
+	private String firstName;
+	
+	@NotBlank
+	private String lastName;
 	
 	@NotBlank
 	@Email
@@ -18,5 +26,5 @@ public class LoginRequestModel {
 	@NotBlank
 	@Min(value=4)
 	private String password;
-
+	
 }

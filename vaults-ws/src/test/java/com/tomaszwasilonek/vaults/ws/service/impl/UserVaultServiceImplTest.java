@@ -1,6 +1,9 @@
 package com.tomaszwasilonek.vaults.ws.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,20 +21,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
 
-import com.tomaszwasilonek.vaults.ws.exceptions.VaultsServiceException;
-import com.tomaszwasilonek.vaults.ws.io.entity.UserEntity;
-import com.tomaszwasilonek.vaults.ws.io.entity.UserVaultsEntity;
-import com.tomaszwasilonek.vaults.ws.io.repositories.UserVaultsRepository;
+import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
+import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
+import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
+import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultsDto;
+import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
-class UserVaultsServiceImplTest {
+class UserVaultServiceImplTest {
 	
 	@InjectMocks
-	UserVaultsServiceImpl userVaultsService;
+	UserVaultServiceImpl userVaultsService;
 	
 	@Mock
-	UserVaultsRepository userVaultsRepository;
+	UserVaultRepository userVaultsRepository;
 	
 	@Mock
 	Utils utils;
@@ -40,13 +44,13 @@ class UserVaultsServiceImplTest {
 	final String NAME = "VaultName";
 	final double BALANCE = 0.00;
 	
-	UserVaultsEntity userVaultsEntity;
+	UserVault userVaultsEntity;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		
-		userVaultsEntity = new UserVaultsEntity();
+		userVaultsEntity = new UserVault();
 		userVaultsEntity.setBalance(BALANCE);
 		userVaultsEntity.setName(NAME);
 		userVaultsEntity.setVaultId(VAULT_ID);
@@ -55,39 +59,39 @@ class UserVaultsServiceImplTest {
 	@Test
 	void testCreateVault() {
 		when(utils.generateVaultId(anyInt())).thenReturn(VAULT_ID);
-		when(userVaultsRepository.save(any(UserVaultsEntity.class))).thenReturn(userVaultsEntity);
+		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(userVaultsEntity);
 		
-		UserVaultsDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultsDto());
+		UserVaultDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultDto());
 	
 		assertNotNull(storedVault);
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
 		assertEquals(userVaultsEntity.getBalance(), storedVault.getBalance());
 		assertEquals(userVaultsEntity.getVaultId(), storedVault.getVaultId());
 		verify(utils, times(1)).generateVaultId(anyInt());
-		verify(userVaultsRepository, times(1)).save(any(UserVaultsEntity.class));
+		verify(userVaultsRepository, times(1)).save(any(UserVault.class));
 	}
 
 	@Test
 	void testCreateVault_duplicateName() {
-		UserVaultsDto userVaultsDto = new UserVaultsDto();
+		UserVaultDto userVaultsDto = new UserVaultDto();
 		userVaultsDto.setName("Duplicated name");
 		
-		when(userVaultsRepository.findByName(anyString())).thenReturn(new UserVaultsEntity());
+		when(userVaultsRepository.findByName(anyString())).thenReturn(new UserVault());
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(RecordAlreadyExistsException.class, () -> {
 			userVaultsService.createVault(new UserEntity(), userVaultsDto);
 		});
 	}
 	
 	@Test
 	void testGetVaults() {
-		List<UserVaultsEntity> vaults = new ArrayList<>();
-		vaults.add(new UserVaultsEntity());
-		vaults.add(new UserVaultsEntity());
+		List<UserVault> vaults = new ArrayList<>();
+		vaults.add(new UserVault());
+		vaults.add(new UserVault());
 		
 		when(userVaultsRepository.findAllByUserDetails(any(UserEntity.class))).thenReturn(vaults);
 		
-		List<UserVaultsDto> storedVaults = userVaultsService.getVaults(new UserEntity());
+		List<UserVaultDto> storedVaults = userVaultsService.getVaults(new UserEntity());
 		
 		assertNotNull(storedVaults);
 		assertEquals(2, storedVaults.size());
@@ -98,7 +102,7 @@ class UserVaultsServiceImplTest {
 	void testGetVault() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(userVaultsEntity);
 		
-		UserVaultsDto storedVault = userVaultsService.getVault(VAULT_ID);
+		UserVaultDto storedVault = userVaultsService.getVault(VAULT_ID);
 		
 		assertNotNull(storedVault);
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
@@ -111,36 +115,36 @@ class UserVaultsServiceImplTest {
 	void testGetVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userVaultsService.getVault(VAULT_ID);
 		});
 	}
 
 	@Test
 	void testUpdateVault() {
-		UserVaultsEntity newUserVaultsEntity = new UserVaultsEntity();
+		UserVault newUserVaultsEntity = new UserVault();
 		BeanUtils.copyProperties(userVaultsEntity, newUserVaultsEntity);
 		newUserVaultsEntity.setName("Test");
 		newUserVaultsEntity.setBalance(10);
 		
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(userVaultsEntity);
-		when(userVaultsRepository.save(any(UserVaultsEntity.class))).thenReturn(newUserVaultsEntity);
+		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(newUserVaultsEntity);
 		
-		UserVaultsDto updatedVault = userVaultsService.updateVault(VAULT_ID, new UserVaultsDto());
+		UserVaultDto updatedVault = userVaultsService.updateVault(VAULT_ID, new UserVaultDto());
 		
 		assertNotNull(updatedVault);
 		assertEquals("Test", updatedVault.getName());
 		assertEquals(10, updatedVault.getBalance());
 		verify(userVaultsRepository, times(1)).findByVaultId(anyString());
-		verify(userVaultsRepository, times(1)).save(any(UserVaultsEntity.class));
+		verify(userVaultsRepository, times(1)).save(any(UserVault.class));
 	}
 	
 	@Test
 	void testUpdateVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
-			userVaultsService.updateVault(VAULT_ID, new UserVaultsDto());
+		assertThrows(EntityNotFoundException.class, () -> {
+			userVaultsService.updateVault(VAULT_ID, new UserVaultDto());
 		});
 	}
 
@@ -158,7 +162,7 @@ class UserVaultsServiceImplTest {
 	void testDeleteVault_vaultNotFound() {
 		when(userVaultsRepository.findByVaultId(anyString())).thenReturn(null);
 		
-		assertThrows(VaultsServiceException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			userVaultsService.deleteVault(VAULT_ID);
 		});
 	}
