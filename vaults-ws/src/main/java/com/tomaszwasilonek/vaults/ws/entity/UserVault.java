@@ -32,7 +32,7 @@ public class UserVault implements Serializable {
 	private double balance;
 	
 	@ManyToOne
-	@JoinColumn(name="users_id")
+	@JoinColumn(name="user_id")
 	private UserEntity userDetails;
 
 }
