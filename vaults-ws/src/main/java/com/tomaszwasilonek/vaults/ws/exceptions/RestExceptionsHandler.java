@@ -201,6 +201,19 @@ public class RestExceptionsHandler extends ResponseEntityExceptionHandler {
 		}
 		return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
 	}
+	
+	/**
+	 * Handle RecordAlreadyExistsException.
+	 *
+	 * @param ex
+	 * @return
+	 */
+	@ExceptionHandler()
+	protected ResponseEntity<Object> handleRecordAlreadyExistsException(RecordAlreadyExistsException ex) {
+		ApiError apiError = new ApiError(BAD_REQUEST);
+		apiError.setMessage(ex.getMessage());
+		return buildResponseEntity(apiError);
+	}
 
 	/**
 	 * Handle Exception, handle generic Exception.class
@@ -215,20 +228,6 @@ public class RestExceptionsHandler extends ResponseEntityExceptionHandler {
 		apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
 				ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
 		apiError.setDebugMessage(ex.getMessage());
-		return buildResponseEntity(apiError);
-	}
-	
-	/**
-	 * Handle RecordAlreadyExistsException.
-	 *
-	 * @param ex
-	 * @return
-	 */
-	@ExceptionHandler()
-	protected ResponseEntity<Object> handleRecordAlreadyExistsException(RecordAlreadyExistsException ex) {
-		ApiError apiError = new ApiError(BAD_REQUEST);
-		apiError.setMessage(ex.getMessage());
-		System.out.println("Error status " + apiError.getStatus());
 		return buildResponseEntity(apiError);
 	}
 

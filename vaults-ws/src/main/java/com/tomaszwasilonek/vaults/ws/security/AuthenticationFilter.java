@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tomaszwasilonek.vaults.ws.SpringApplicationContext;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
-import com.tomaszwasilonek.vaults.ws.ui.model.request.UserLoginRequestModel;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.LoginRequestModel;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -38,8 +38,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 			throws AuthenticationException {
 		
 		try {
-			UserLoginRequestModel creds = new ObjectMapper()
-					.readValue(request.getInputStream(), UserLoginRequestModel.class);
+			LoginRequestModel creds = new ObjectMapper()
+					.readValue(request.getInputStream(), LoginRequestModel.class);
 			
 			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(
