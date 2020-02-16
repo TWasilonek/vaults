@@ -12,10 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity(name="user")
 @Data
-public class UserEntity implements Serializable {
+@EqualsAndHashCode(callSuper=false)
+public class UserEntity extends AuditModel implements Serializable {
 
 	private static final long serialVersionUID = 956484066067704831L;
 	
@@ -43,7 +45,7 @@ public class UserEntity implements Serializable {
 	@Column(nullable=false)
 	private Boolean emailVerificationStatus = false;
 
-	// TODO is it needed?
+	// TODO Explore if bidirectional one-to-many mapping is needed, check the ending of this article - https://www.callicoder.com/hibernate-spring-boot-jpa-one-to-many-mapping-example/
 	@OneToMany(mappedBy="userDetails", cascade=CascadeType.ALL)
 	private List<UserVault> vaults;
 	

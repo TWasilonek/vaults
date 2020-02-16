@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.tomaszwasilonek.vaults.ws.security.AppProperties;
 
 @SpringBootApplication
+@EnableJpaAuditing
 public class VaultsWsApplication extends SpringBootServletInitializer {
 	
 	// Needed to create a WAR file
