@@ -96,6 +96,28 @@ class UsersWebServiceEndpointTest {
 	}
 	
 	@Test
+	@Order(2)
+	void testCreateUser_failingRequiredFields() {
+		Map<String, Object> userDetails = new HashMap<>();
+		userDetails.put(FIRST_NAME_KEY, "");
+		userDetails.put(LAST_NAME_KEY, "");
+		userDetails.put(EMAIL_KEY, "");
+		userDetails.put(PASSWORD_KEY, "");
+			
+		Response response = given().
+			contentType(JSON).
+			accept(JSON).
+			body(userDetails).
+		when().
+			post(CONTEXT_PATH + "/users").
+		then().
+			statusCode(400).
+			extract().response();
+		
+		assertEquals(5, response.jsonPath().getList(("apierror.subErrors")).size());
+	}
+	
+	@Test
 	@Order(3)
 	void testUserLogin() {
 		Map<String, Object> userDetails = new HashMap<>();

@@ -18,7 +18,7 @@ public class RecordAlreadyExistsException extends CustomRuntimeException {
 	}
 
 	private static String generateMessage(String entity, Map<String, String> searchParams) {
-		return "Record '" +  StringUtils.capitalize(entity) + "' where " + searchParams + " already exists.";
+		return StringUtils.capitalize(entity) + " where " + searchParams + " already exists.";
 	}
 
 }

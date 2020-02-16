@@ -1,14 +1,18 @@
 package com.tomaszwasilonek.vaults.ws.ui.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,10 +22,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
 
-import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.service.impl.UserServiceImpl;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.SignUpRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
@@ -95,7 +99,7 @@ class UserControllerTest {
 
 		assertDoesNotThrow(() -> {
 			UserRest userRest = userController
-					.createUser(new UserDetailsRequestModel(FIRST_NAME, LAST_NAME, EMAIL, RAW_PASSWORD));
+					.createUser(new SignUpRequestModel(FIRST_NAME, LAST_NAME, EMAIL, RAW_PASSWORD));
 
 			assertNotNull(userRest);
 			assertEquals(USER_ID, userRest.getUserId());
@@ -108,17 +112,17 @@ class UserControllerTest {
 
 	@Test
 	void testCreateUser_missingRequiredFields() {
-		assertThrows(MissingRequiredFieldsException.class, () -> {
-			userController.createUser(new UserDetailsRequestModel("", LAST_NAME, EMAIL, RAW_PASSWORD));
+		assertThrows(IllegalArgumentException.class, () -> {
+			userController.createUser(new SignUpRequestModel("", LAST_NAME, EMAIL, RAW_PASSWORD));
 		});
-		assertThrows(MissingRequiredFieldsException.class, () -> {
-			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, "", EMAIL, RAW_PASSWORD));
+		assertThrows(IllegalArgumentException.class, () -> {
+			userController.createUser(new SignUpRequestModel(FIRST_NAME, "", EMAIL, RAW_PASSWORD));
 		});
-		assertThrows(MissingRequiredFieldsException.class, () -> {
-			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, LAST_NAME, "", RAW_PASSWORD));
+		assertThrows(IllegalArgumentException.class, () -> {
+			userController.createUser(new SignUpRequestModel(FIRST_NAME, LAST_NAME, "", RAW_PASSWORD));
 		});
-		assertThrows(MissingRequiredFieldsException.class, () -> {
-			userController.createUser(new UserDetailsRequestModel(FIRST_NAME, LAST_NAME, EMAIL, ""));
+		assertThrows(IllegalArgumentException.class, () -> {
+			userController.createUser(new SignUpRequestModel(FIRST_NAME, LAST_NAME, EMAIL, ""));
 		});
 	}
 
@@ -149,7 +153,7 @@ class UserControllerTest {
 	
 	@Test
 	void testUpdateUser_missingRequiredFields() {
-		assertThrows(MissingRequiredFieldsException.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("");
 			userDetails.setLastName("ChangedLastName");
@@ -158,7 +162,7 @@ class UserControllerTest {
 			userController.updateUser(USER_ID, userDetails);
 		});
 		
-		assertThrows(MissingRequiredFieldsException.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("ChangedFirstName");
 			userDetails.setLastName("");
@@ -167,7 +171,7 @@ class UserControllerTest {
 			userController.updateUser(USER_ID, userDetails);
 		});
 		
-		assertThrows(MissingRequiredFieldsException.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			UserDetailsRequestModel userDetails = new UserDetailsRequestModel();
 			userDetails.setFirstName("ChangedFirstName");
 			userDetails.setLastName("ChangedLastName");
@@ -220,7 +224,7 @@ class UserControllerTest {
 		
 		@Test
 		void testCreateUserVault_missingRequiredFields() {
-			assertThrows(MissingRequiredFieldsException.class, () -> {
+			assertThrows(IllegalArgumentException.class, () -> {
 				VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
 				vaultDetails.setName("");
 				
@@ -269,8 +273,17 @@ class UserControllerTest {
 				assertNotNull(userVaultRest);
 				assertEquals("Changed Name", userVaultRest.getName());
 				verify(userService, times(1)).updateVault(anyString(), anyString(), any(UserVaultDto.class));
+			});		
+		}
+		
+		@Test
+		void testUpdateUserVault_missingRequiredFields() {
+			assertThrows(IllegalArgumentException.class, () -> {
+				VaultsDetailsRequestModel vaultDetails = new VaultsDetailsRequestModel();
+				vaultDetails.setName("");
+				
+				userController.updateVault(USER_ID, VAULT_ID, vaultDetails);
 			});
-			
 		}
 		
 		@Test

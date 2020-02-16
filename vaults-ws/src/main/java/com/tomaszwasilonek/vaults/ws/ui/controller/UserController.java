@@ -3,6 +3,8 @@ package com.tomaszwasilonek.vaults.ws.ui.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,13 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tomaszwasilonek.vaults.ws.exceptions.MissingRequiredFieldsException;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
+import com.tomaszwasilonek.vaults.ws.ui.model.request.SignUpRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.UserDetailsRequestModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.request.VaultsDetailsRequestModel;
-import com.tomaszwasilonek.vaults.ws.ui.model.response.ErrorMessages;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
@@ -75,13 +76,8 @@ public class UserController {
 	@PostMapping(
 			consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
 			produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
+	public UserRest createUser(@Valid @RequestBody SignUpRequestModel userDetails) throws Exception {
 		UserRest returnValue = new UserRest();
-
-		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
-				|| userDetails.getEmail().isEmpty() || userDetails.getPassword().isEmpty()) {
-			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		}
 
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
@@ -101,11 +97,6 @@ public class UserController {
 	public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
 			throws Exception {
 		UserRest returnValue = new UserRest();
-
-		if (userDetails.getFirstName().isEmpty() || userDetails.getLastName().isEmpty()
-				|| userDetails.getEmail().isEmpty()) {
-			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		}
 
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
@@ -138,11 +129,7 @@ public class UserController {
 			produces = { MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE })
 	public UserVaultsRest createVault(
 			@PathVariable String userId,
-			@RequestBody VaultsDetailsRequestModel vaultDetails) {
-		
-		if (vaultDetails.getName().isEmpty()) {
-			throw new MissingRequiredFieldsException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		}
+			@Valid @RequestBody VaultsDetailsRequestModel vaultDetails) {
 		
 		UserVaultsRest returnValue = new UserVaultsRest();
 
@@ -201,7 +188,7 @@ public class UserController {
 	public UserVaultsRest updateVault(
 			@PathVariable String userId,
 			@PathVariable String vaultId,
-			@RequestBody VaultsDetailsRequestModel vaultDetails) throws Exception {
+			@Valid @RequestBody VaultsDetailsRequestModel vaultDetails) throws Exception {
 		UserVaultsRest returnValue = new UserVaultsRest();
 
 		UserVaultDto vaultsDto = new UserVaultDto();

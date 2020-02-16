@@ -1,22 +1,15 @@
 package com.tomaszwasilonek.vaults.ws.ui.model.request;
 
+import javax.validation.constraints.NotBlank;
+
+import lombok.Data;
+
+@Data
 public class VaultsDetailsRequestModel {
+	
+	@NotBlank
 	private String name;
+	
 	private double balance;
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public double getBalance() {
-		return balance;
-	}
-
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
 }
