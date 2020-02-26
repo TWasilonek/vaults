@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
+import org.springframework.test.context.TestPropertySource;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
@@ -29,6 +30,7 @@ import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
+@TestPropertySource("/application-dev.properties")
 class UserVaultServiceImplTest {
 	
 	@InjectMocks

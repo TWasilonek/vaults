@@ -11,13 +11,13 @@
 	</parent>
 	<groupId>com.tomaszwasilonek.vaults.ws</groupId>
 	<artifactId>vaults-ws</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 	<name>vaults-ws</name>
 	<description>Web service for Vaults project</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 
 	<dependencies>

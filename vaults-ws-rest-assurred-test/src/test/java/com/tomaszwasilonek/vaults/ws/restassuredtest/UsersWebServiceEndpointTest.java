@@ -19,7 +19,7 @@ import io.restassured.response.Response;
 @TestMethodOrder(OrderAnnotation.class)
 class UsersWebServiceEndpointTest {
 	
-	private final String CONTEXT_PATH = "/rest/v1";
+	private final String CONTEXT_PATH = "/api";
 	
 	private final String FIRST_NAME_KEY = "firstName";
 	private final String LAST_NAME_KEY = "lastName";
@@ -46,7 +46,7 @@ class UsersWebServiceEndpointTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		RestAssured.baseURI = "http://localhost";
-		RestAssured.port = 8888;
+		RestAssured.port = 8080;
 	}
 	
 	@Test

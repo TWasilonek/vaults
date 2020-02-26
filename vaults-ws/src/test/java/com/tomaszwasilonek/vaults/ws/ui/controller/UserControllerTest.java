@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.BeanUtils;
+import org.springframework.test.context.TestPropertySource;
 
 import com.tomaszwasilonek.vaults.ws.service.impl.UserServiceImpl;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
@@ -34,6 +35,7 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserRest;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.UserVaultRest;
 
+@TestPropertySource("/application-dev.properties")
 class UserControllerTest {
 
 	@InjectMocks
