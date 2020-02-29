@@ -59,7 +59,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	// By default SpringSecurity sets it to "/login"
 	public AuthenticationFilter getAuthenticationFilter() throws Exception {
 		final AuthenticationFilter filter = new AuthenticationFilter(authenticationManager());
-		filter.setFilterProcessesUrl("/login");
+		filter.setFilterProcessesUrl("/api/login");
 		return filter;
 	}
 	

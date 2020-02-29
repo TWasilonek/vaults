@@ -34,7 +34,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 
 @RestController
-@RequestMapping("/users") // http://localhost:8888/api/users
+@RequestMapping("/api/users") // http://localhost:8888/api/users
 public class UserController {
 
 	@Autowired
