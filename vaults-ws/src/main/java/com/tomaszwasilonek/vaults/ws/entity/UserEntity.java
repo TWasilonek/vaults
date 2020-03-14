@@ -1,6 +1,7 @@
 package com.tomaszwasilonek.vaults.ws.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -10,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +37,9 @@ public class UserEntity extends AuditModel implements Serializable {
 	@Column(nullable=false, length=50)
 	private String lastName;
 	
-	@Column(nullable=false, length=120)
+	@Email(message = "email is not valid")
+	@NotBlank(message = "username is required")
+	@Column(nullable=false, unique=true, length=120)
 	private String email;
 	
 	@Column(nullable=false)
@@ -47,6 +52,6 @@ public class UserEntity extends AuditModel implements Serializable {
 
 	// TODO Explore if bidirectional one-to-many mapping is needed, check the ending of this article - https://www.callicoder.com/hibernate-spring-boot-jpa-one-to-many-mapping-example/
 	@OneToMany(mappedBy="userDetails", cascade=CascadeType.ALL)
-	private List<UserVault> vaults;
+	private List<UserVault> vaults = new ArrayList<>();
 	
 }

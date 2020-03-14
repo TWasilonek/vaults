@@ -12,54 +12,59 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
-import io.jsonwebtoken.Jwts;
+import com.tomaszwasilonek.vaults.ws.SpringApplicationContext;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
 	public AuthorizationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
+
 		String header = request.getHeader(SecurityConstants.HEADER_STRING);
-		
+
 		if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
 			chain.doFilter(request, response);
 			return;
 		}
-		
+
 		UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		chain.doFilter(request, response);
 	}
-	
+
 	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-		String token = request.getHeader(SecurityConstants.HEADER_STRING);
+		String token = getJWTFromRequest(request);
 		
-		if (token != null) {
-			token = token.replace(SecurityConstants.TOKEN_PREFIX, "");
-			
-			String user = Jwts.parser()
-					.setSigningKey(SecurityConstants.getTokenSecret())
-					.parseClaimsJws(token)
-					.getBody()
-					.getSubject();
-			
-			if (user != null) {
-				return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+		JwtTokenProvider tokenProvider = (JwtTokenProvider) SpringApplicationContext.getBean("jwtTokenProvider");
+		
+		if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+
+			String userId = tokenProvider.getUserIdFromJWT(token);
+
+			if (userId != null) {
+				return new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
 			}
-			
+
 			return null;
 		}
-		
+
 		return null;
 	}
-	
-	
+
+	private String getJWTFromRequest(HttpServletRequest request) {
+		String bearerToken = request.getHeader(SecurityConstants.HEADER_STRING);
+
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+			return bearerToken.replace(SecurityConstants.TOKEN_PREFIX, "");
+		}
+
+		return null;
+	}
 
 }

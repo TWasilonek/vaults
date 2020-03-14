@@ -18,4 +18,8 @@ public class UserDto implements Serializable {
 	private String emailVerificationToken;
 	private Boolean emailVerificationStatus = false;
 	
+	public String getFullName() {
+		return firstName + " " + lastName;
+	}
+	
 }
