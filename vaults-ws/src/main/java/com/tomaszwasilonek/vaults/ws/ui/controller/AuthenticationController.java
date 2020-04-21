@@ -33,7 +33,7 @@ public class AuthenticationController {
 								response = String.class),
 					})
 	})
-	@PostMapping("/login")
+	@PostMapping("/api/login")
 	public void theFakeLogin(@RequestBody LoginRequestModel loginRequestModel) {
 		throw new IllegalStateException("This method should not be called. This method is implemented by Spring Security");
 	}

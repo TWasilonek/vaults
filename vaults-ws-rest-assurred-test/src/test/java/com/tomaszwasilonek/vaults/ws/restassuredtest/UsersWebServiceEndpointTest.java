@@ -29,7 +29,7 @@ class UsersWebServiceEndpointTest {
 
 	private final String FIRST_NAME = "RestAssured";
 	private final String LAST_NAME = "User";
-	private final String EMAIL = "rau@test.pl";
+	private final String EMAIL = "RestAssuredTest@test.pl";
 	private final String PASSWORD = "1234";
 	
 	private final String VAULT_NAME_KEY = "name";
@@ -135,7 +135,8 @@ class UsersWebServiceEndpointTest {
 				extract().response();
 		
 		authorizationHeader = response.header("Authorization");
-		userId = response.header("UserID");
+		// TODO: Get the userId from token
+//		userId = response.header("UserID");
 		
 		assertNotNull(authorizationHeader);
 		assertNotNull(userId);
