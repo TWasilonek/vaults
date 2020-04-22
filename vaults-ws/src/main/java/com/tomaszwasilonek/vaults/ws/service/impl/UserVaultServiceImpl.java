@@ -15,6 +15,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
+import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @Component
@@ -93,6 +94,11 @@ public class UserVaultServiceImpl implements UserVaultService {
 		}
 		
 		userVaultsRepository.delete(vault);
+	}
+	
+	@Override
+	public void applyInternalTransaction(InternalTransactionDTO transaction) {
+		// TODO:
 	}
 
 	private UserVaultDto saveAndReturnStoredVaultDetails(UserVault vault) {

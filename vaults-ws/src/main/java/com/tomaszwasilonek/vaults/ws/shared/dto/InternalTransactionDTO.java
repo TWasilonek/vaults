@@ -6,5 +6,5 @@ import lombok.Data;
 public class InternalTransactionDTO {
 	private double amount;
 	private String sourceVaultId;
-	private String destinationVaultId;
+	private String targetVaultId;
 }

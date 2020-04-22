@@ -39,7 +39,7 @@ public class TransactionControllerTest {
 		InternalTransactionDTO transaction = new InternalTransactionDTO();
 		transaction.setAmount(200);
 		transaction.setSourceVaultId("sourceVaultId");
-		transaction.setDestinationVaultId("destinationVaultId");
+		transaction.setTargetVaultId("targetVaultId");
 		
 		when(transactionService.makeInternalTransaction(any(InternalTransactionDTO.class))).thenReturn(transaction);
 		

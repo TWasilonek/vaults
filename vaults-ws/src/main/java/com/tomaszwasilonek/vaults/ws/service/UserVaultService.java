@@ -3,6 +3,7 @@ package com.tomaszwasilonek.vaults.ws.service;
 import java.util.List;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
+import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 public interface UserVaultService {
@@ -15,4 +16,6 @@ public interface UserVaultService {
 	UserVaultDto updateVault(String vaultId, UserVaultDto vaultDetails);
 	
 	void deleteVault(String vaultId);
+	
+	void applyInternalTransaction(InternalTransactionDTO transaction);
 }

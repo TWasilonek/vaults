@@ -169,4 +169,8 @@ class UserVaultServiceImplTest {
 		});
 	}
 
+	@Test
+	void testApplyInternalTransaction() {
+		// TODO: 
+	}
 }
