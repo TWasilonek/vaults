@@ -98,7 +98,23 @@ public class UserVaultServiceImpl implements UserVaultService {
 	
 	@Override
 	public void applyInternalTransaction(InternalTransactionDTO transaction) {
-		// TODO:
+		UserVault sourceVault = userVaultsRepository.findByVaultId(transaction.getSourceVaultId());
+		
+		if (sourceVault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", transaction.getSourceVaultId());
+		}
+		
+		UserVault targetVault = userVaultsRepository.findByVaultId(transaction.getTargetVaultId());
+		
+		if (targetVault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", transaction.getTargetVaultId());
+		}
+		
+		sourceVault.setBalance(sourceVault.getBalance() - transaction.getAmount());
+		targetVault.setBalance(targetVault.getBalance() + transaction.getAmount());
+		
+		userVaultsRepository.save(sourceVault);
+		userVaultsRepository.save(targetVault);
 	}
 
 	private UserVaultDto saveAndReturnStoredVaultDetails(UserVault vault) {

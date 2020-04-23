@@ -4,12 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +23,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
+import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @TestPropertySource("/application-dev.properties")
@@ -169,8 +165,38 @@ class UserVaultServiceImplTest {
 		});
 	}
 
+	// TODO: write more tests for different balances and when source or target vault does not exist
 	@Test
 	void testApplyInternalTransaction() {
-		// TODO: 
+		UserVault sourceVault = new UserVault();
+		UserVault targetVault = new UserVault();
+		
+		BeanUtils.copyProperties(userVaultsEntity, sourceVault);
+		BeanUtils.copyProperties(userVaultsEntity, targetVault);
+
+		sourceVault.setVaultId("source");
+		sourceVault.setBalance(10.00);
+		targetVault.setVaultId("target");
+		targetVault.setBalance(20.00);
+		
+		
+		when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+		when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+ 
+		InternalTransactionDTO transaction = new InternalTransactionDTO();
+		transaction.setAmount(10.00);
+		transaction.setSourceVaultId("source");
+		transaction.setTargetVaultId("target");
+		
+		userVaultsService.applyInternalTransaction(transaction);
+		
+		verify(userVaultsRepository, times(1)).findByVaultId("source");
+		verify(userVaultsRepository, times(1)).findByVaultId("target");
+		verify(userVaultsRepository, times(2)).save(any(UserVault.class));
+		verify(userVaultsRepository).save(argThat(
+				(UserVault aVault) -> aVault.getVaultId() == "source" && aVault.getBalance() == 0));
+		verify(userVaultsRepository).save(argThat(
+				(UserVault aVault) -> aVault.getVaultId() == "target" && aVault.getBalance() == 30.00));
+
 	}
 }
