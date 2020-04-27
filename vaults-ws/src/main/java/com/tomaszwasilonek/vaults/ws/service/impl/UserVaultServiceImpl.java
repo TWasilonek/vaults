@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.BalanceTooLowException;
 import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
@@ -97,7 +98,7 @@ public class UserVaultServiceImpl implements UserVaultService {
 	}
 	
 	@Override
-	public void makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {
+	public void makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {	
 		UserVault sourceVault = userVaultsRepository.findByVaultId(moneyTransfer.getSourceAccount());
 		
 		if (sourceVault == null) {
@@ -110,7 +111,10 @@ public class UserVaultServiceImpl implements UserVaultService {
 			 throw new EntityNotFoundException(UserVault.class, "vault_id", moneyTransfer.getDestinationAccount());
 		}
 		
-		// TODO: Validate that there is enough balance on the source vault
+		if (sourceVault.getBalance() <= 0 || sourceVault.getBalance() < moneyTransfer.getAmount()) {
+			throw new BalanceTooLowException(UserVault.class, "vault_id", moneyTransfer.getSourceAccount());
+		}
+		
 		sourceVault.setBalance(sourceVault.getBalance() - moneyTransfer.getAmount());
 		targetVault.setBalance(targetVault.getBalance() + moneyTransfer.getAmount());
 		

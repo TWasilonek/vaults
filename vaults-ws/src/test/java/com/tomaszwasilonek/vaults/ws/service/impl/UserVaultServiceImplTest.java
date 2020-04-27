@@ -26,6 +26,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.BalanceTooLowException;
 import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
@@ -174,28 +175,33 @@ class UserVaultServiceImplTest {
 	
 	@Nested
 	class TestMoneyTransfer {
-		// TODO: write more tests for different balances and when source or target vault does not exist
-		@Test
-		void testMakeMoneyTransfer() {
-			UserVault sourceVault = new UserVault();
-			UserVault targetVault = new UserVault();
-			
+		UserVault sourceVault;
+		UserVault targetVault;
+		MoneyTransferDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			sourceVault = new UserVault();
 			BeanUtils.copyProperties(userVaultsEntity, sourceVault);
-			BeanUtils.copyProperties(userVaultsEntity, targetVault);
-
 			sourceVault.setVaultId("source");
 			sourceVault.setBalance(10.00);
+			
+			targetVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, targetVault);
 			targetVault.setVaultId("target");
 			targetVault.setBalance(20.00);
 			
-			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
-			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
-	 
-			MoneyTransferDTO payment = new MoneyTransferDTO();
+			payment = new MoneyTransferDTO();
 			payment.setAmount(10.00);
 			payment.setSourceAccount("source");
 			payment.setDestinationAccount("target");
-			
+		}
+		
+		@Test
+		void testMakeMoneyTransfer() {
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+	 		
 			userVaultsService.makeMoneyTransfer(payment);
 			
 			verify(userVaultsRepository, times(1)).findByVaultId("source");
@@ -205,7 +211,36 @@ class UserVaultServiceImplTest {
 					(UserVault aVault) -> aVault.getVaultId() == "source" && aVault.getBalance() == 0));
 			verify(userVaultsRepository).save(argThat(
 					(UserVault aVault) -> aVault.getVaultId() == "target" && aVault.getBalance() == 30.00));
-
+		}
+		
+		@Test
+		void testMakeMoneyTransfer_sourceVaultNotFound() {	
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.makeMoneyTransfer(payment);
+			});
+		}
+		
+		@Test
+		void testMakeMoneyTransfer_targetVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.makeMoneyTransfer(payment);
+			});
+		}
+		
+		@Test
+		void testMakeMoneyTransfer_sourceVaultBalanceTooLow() {
+			sourceVault.setBalance(0);
+			
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+			
+			assertThrows(BalanceTooLowException.class, () -> {
+				userVaultsService.makeMoneyTransfer(payment);
+			});
 		}
 	}
 }

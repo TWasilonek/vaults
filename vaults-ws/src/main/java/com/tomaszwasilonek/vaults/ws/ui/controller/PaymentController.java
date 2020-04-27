@@ -13,13 +13,14 @@ import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 
 @RestController
-@RequestMapping("/api/transactions") // http://localhost:8888/api/transactions
+@RequestMapping("/api/transactions")
 public class PaymentController {
 	
 	@Autowired
 	PaymentService paymentService;
 
 	// TODO: add body validation
+	// TODO: test if Vaults belong to User -> maybe an Aspect or Annotation?
 	@PostMapping("/money-transfer")
 	public OperationStatusModel makeMoneyTransfer(@RequestBody MoneyTransferDTO moneyTransfer) {
 		OperationStatusModel returnValue = new OperationStatusModel();
@@ -31,6 +32,6 @@ public class PaymentController {
 		return returnValue;
 	}
 	
-	// TODO: /external/withdraw
 	// TODO: /external/deposit
+	// TODO: /external/withdraw
 }

@@ -22,8 +22,6 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public MoneyTransferDTO makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {
 		
-		// TODO: VERIFY that vaults exist and are assigned to the same User
-		
 		// TODO: is it the best way to do event sourcing?
 		Payment paymentEntity = new Payment();
 		BeanUtils.copyProperties(moneyTransfer, paymentEntity);
