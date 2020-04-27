@@ -6,26 +6,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tomaszwasilonek.vaults.ws.service.TransactionService;
-import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
+import com.tomaszwasilonek.vaults.ws.service.PaymentService;
+import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 
 @RestController
 @RequestMapping("/api/transactions") // http://localhost:8888/api/transactions
-public class TransactionController {
+public class PaymentController {
 	
 	@Autowired
-	TransactionService transactionService;
+	PaymentService paymentService;
 
 	// TODO: add body validation
-	@PostMapping("/internal")
-	public OperationStatusModel postInternalTransaction(@RequestBody InternalTransactionDTO transaction) {
+	@PostMapping("/money-transfer")
+	public OperationStatusModel makeMoneyTransfer(@RequestBody MoneyTransferDTO moneyTransfer) {
 		OperationStatusModel returnValue = new OperationStatusModel();
-		returnValue.setOperationName(RequestOperationName.INTERNAL_TRANSACTION.name());
+		returnValue.setOperationName(RequestOperationName.MONEY_TRANSFER.name());
 		
-		transactionService.makeInternalTransaction(transaction);
+		paymentService.makeMoneyTransfer(moneyTransfer);
 		
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;

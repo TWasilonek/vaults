@@ -15,7 +15,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @Component
@@ -97,21 +97,22 @@ public class UserVaultServiceImpl implements UserVaultService {
 	}
 	
 	@Override
-	public void applyInternalTransaction(InternalTransactionDTO transaction) {
-		UserVault sourceVault = userVaultsRepository.findByVaultId(transaction.getSourceVaultId());
+	public void makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {
+		UserVault sourceVault = userVaultsRepository.findByVaultId(moneyTransfer.getSourceAccount());
 		
 		if (sourceVault == null) {
-			 throw new EntityNotFoundException(UserVault.class, "vault_id", transaction.getSourceVaultId());
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", moneyTransfer.getSourceAccount());
 		}
 		
-		UserVault targetVault = userVaultsRepository.findByVaultId(transaction.getTargetVaultId());
+		UserVault targetVault = userVaultsRepository.findByVaultId(moneyTransfer.getDestinationAccount());
 		
 		if (targetVault == null) {
-			 throw new EntityNotFoundException(UserVault.class, "vault_id", transaction.getTargetVaultId());
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", moneyTransfer.getDestinationAccount());
 		}
 		
-		sourceVault.setBalance(sourceVault.getBalance() - transaction.getAmount());
-		targetVault.setBalance(targetVault.getBalance() + transaction.getAmount());
+		// TODO: Validate that there is enough balance on the source vault
+		sourceVault.setBalance(sourceVault.getBalance() - moneyTransfer.getAmount());
+		targetVault.setBalance(targetVault.getBalance() + moneyTransfer.getAmount());
 		
 		userVaultsRepository.save(sourceVault);
 		userVaultsRepository.save(targetVault);

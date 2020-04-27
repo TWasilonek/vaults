@@ -3,9 +3,9 @@ package com.tomaszwasilonek.vaults.ws.repositories;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.tomaszwasilonek.vaults.ws.entity.Transaction;
+import com.tomaszwasilonek.vaults.ws.entity.Payment;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction, Long> {
+public interface PaymentRepository extends CrudRepository<Payment, Long> {
 	
 }

@@ -15,19 +15,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.tomaszwasilonek.vaults.ws.service.impl.TransactionServiceImpl;
-import com.tomaszwasilonek.vaults.ws.shared.dto.InternalTransactionDTO;
+import com.tomaszwasilonek.vaults.ws.service.impl.PaymentServiceImpl;
+import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
 
-public class TransactionControllerTest {
+public class PaymentControllerTest {
 	
 	@InjectMocks
-	TransactionController transactionController;
+	PaymentController paymentController;
 	
 	@Mock
-	TransactionServiceImpl transactionService;
+	PaymentServiceImpl paymentService;
 	
 	@BeforeEach
 	void setUp() throws Exception {
@@ -35,18 +35,18 @@ public class TransactionControllerTest {
 	}
 
 	@Test
-	void testPostInternalTransaction() {
-		InternalTransactionDTO transaction = new InternalTransactionDTO();
-		transaction.setAmount(200);
-		transaction.setSourceVaultId("sourceVaultId");
-		transaction.setTargetVaultId("targetVaultId");
+	void testMakeMoneyTransfer() {
+		MoneyTransferDTO moneyTransfer = new MoneyTransferDTO();
+		moneyTransfer.setAmount(200);
+		moneyTransfer.setSourceAccount("sourceVaultId");
+		moneyTransfer.setDestinationAccount("targetVaultId");
 		
-		when(transactionService.makeInternalTransaction(any(InternalTransactionDTO.class))).thenReturn(transaction);
+		when(paymentService.makeMoneyTransfer(any(MoneyTransferDTO.class))).thenReturn(moneyTransfer);
 		
-		OperationStatusModel response = transactionController.postInternalTransaction(transaction);
+		OperationStatusModel response = paymentController.makeMoneyTransfer(moneyTransfer);
 		assertNotNull(response);
-		assertEquals(RequestOperationName.INTERNAL_TRANSACTION.name(), response.getOperationName());
+		assertEquals(RequestOperationName.MONEY_TRANSFER.name(), response.getOperationName());
 		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
-		verify(transactionService, times(1)).makeInternalTransaction(any(InternalTransactionDTO.class));
+		verify(paymentService, times(1)).makeMoneyTransfer(any(MoneyTransferDTO.class));
 	}
 }
