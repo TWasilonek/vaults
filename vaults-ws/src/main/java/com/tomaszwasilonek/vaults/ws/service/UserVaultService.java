@@ -18,4 +18,6 @@ public interface UserVaultService {
 	void deleteVault(String vaultId);
 	
 	void moneyTransfer(PaymentDTO transaction);
+	
+	void deposit(PaymentDTO deposit);
 }

@@ -121,6 +121,19 @@ public class UserVaultServiceImpl implements UserVaultService {
 		userVaultsRepository.save(sourceVault);
 		userVaultsRepository.save(targetVault);
 	}
+	
+	@Override
+	public void deposit(PaymentDTO theDeposit) {	
+		UserVault targetVault = userVaultsRepository.findByVaultId(theDeposit.getDestinationAccount());
+		
+		if (targetVault == null) {
+			 throw new EntityNotFoundException(UserVault.class, "vault_id", theDeposit.getDestinationAccount());
+		}
+
+		targetVault.setBalance(targetVault.getBalance() + theDeposit.getAmount());
+		
+		userVaultsRepository.save(targetVault);
+	}
 
 	private UserVaultDto saveAndReturnStoredVaultDetails(UserVault vault) {
 		UserVault storedVaultDetails = userVaultsRepository.save(vault);

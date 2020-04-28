@@ -243,4 +243,44 @@ class UserVaultServiceImplTest {
 			});
 		}
 	}
+	
+	@Nested
+	class testDeposit {
+		UserVault targetVault;
+		PaymentDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {			
+			targetVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, targetVault);
+			targetVault.setVaultId("target");
+			targetVault.setBalance(20.00);
+			
+			payment = new PaymentDTO();
+			payment.setAmount(10.00);
+			payment.setSourceAccount("source");
+			payment.setDestinationAccount("target");
+		}
+		
+		@Test
+		void testDeposit_HappyPath() {
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+	 		
+			userVaultsService.deposit(payment);
+			
+			verify(userVaultsRepository, times(1)).findByVaultId("target");
+			verify(userVaultsRepository, times(1)).save(any(UserVault.class));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "target" && aVault.getBalance() == 30.00));
+		}
+		
+		@Test
+		void testDeposit_targetVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.deposit(payment);
+			});
+		}
+	}
 }

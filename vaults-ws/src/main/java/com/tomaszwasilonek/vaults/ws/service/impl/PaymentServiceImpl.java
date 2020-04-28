@@ -8,6 +8,7 @@ import com.tomaszwasilonek.vaults.ws.entity.Payment;
 import com.tomaszwasilonek.vaults.ws.repositories.PaymentRepository;
 import com.tomaszwasilonek.vaults.ws.service.PaymentService;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
+import com.tomaszwasilonek.vaults.ws.shared.constants.ApplicationConstants;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 
 @Service
@@ -24,6 +25,10 @@ public class PaymentServiceImpl implements PaymentService {
 		Payment paymentEntity = new Payment();
 		BeanUtils.copyProperties(moneyTransfer, paymentEntity);
 		
+		// the destination and source accounts are user Vault
+		paymentEntity.setDestinationSubject(ApplicationConstants.APP_NAME);
+		paymentEntity.setSourceSubject(ApplicationConstants.APP_NAME);
+		
 		// update the user vaults
 		userVaultService.moneyTransfer(moneyTransfer);
 		
@@ -35,15 +40,18 @@ public class PaymentServiceImpl implements PaymentService {
 		Payment paymentEntity = new Payment();
 		BeanUtils.copyProperties(theDeposit, paymentEntity);
 		
+		// the destination account is a user Vault
+		paymentEntity.setDestinationSubject(ApplicationConstants.APP_NAME);
+		
 		// update the user vault
-//		userVaultService.deposit(theDeposit);
+		userVaultService.deposit(theDeposit);
 		
 		return saveAndReturnPayment(paymentEntity);
 	}
 	
 	private PaymentDTO saveAndReturnPayment(Payment payment) {
-		Payment storedTransaction = transactionRepository.save(payment);
-		return mapPaymentEntityToPaymentDTO(storedTransaction);
+		Payment storedPayment = transactionRepository.save(payment);
+		return mapPaymentEntityToPaymentDTO(storedPayment);
 	}
 	
 	private PaymentDTO mapPaymentEntityToPaymentDTO(Payment payment) {

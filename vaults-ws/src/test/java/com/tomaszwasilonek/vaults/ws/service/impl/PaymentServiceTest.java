@@ -45,6 +45,8 @@ public class PaymentServiceTest {
 	void testMoneyTransfer() {
 		thePayment.setSourceAccount(SOURCE_VAULT_ID);
 		thePayment.setDestinationAccount(TARGET_VAULT_ID);
+		thePayment.setSourceSubject(ApplicationConstants.APP_NAME);
+		thePayment.setDestinationSubject(ApplicationConstants.APP_NAME);
 	
 		PaymentDTO moneyTransferDTO;
 		moneyTransferDTO = new PaymentDTO();
@@ -59,10 +61,8 @@ public class PaymentServiceTest {
 		assertEquals(10.00, storedMoneyTransfer.getAmount());
 		assertEquals(SOURCE_VAULT_ID, storedMoneyTransfer.getSourceAccount());
 		assertEquals(TARGET_VAULT_ID, storedMoneyTransfer.getDestinationAccount());
-		
-		// TODO: fix this logic
-//		assertEquals(ApplicationConstants.APP_NAME, storedMoneyTransfer.destinationSubject);
-//		assertEquals(ApplicationConstants.APP_NAME, storedMoneyTransfer.sourceSubject);
+		assertEquals(ApplicationConstants.APP_NAME, storedMoneyTransfer.getDestinationSubject());
+		assertEquals(ApplicationConstants.APP_NAME, storedMoneyTransfer.getSourceSubject());
 		
 		verify(paymentRepository, times(1)).save(any(Payment.class));
 		verify(userVaultService, times(1)).moneyTransfer(any(PaymentDTO.class));
@@ -73,25 +73,26 @@ public class PaymentServiceTest {
 		thePayment.setSourceAccount("12345");
 		thePayment.setSourceSubject("some bank");
 		thePayment.setDestinationAccount(TARGET_VAULT_ID);
+		thePayment.setDestinationSubject(ApplicationConstants.APP_NAME);
 		
 		PaymentDTO theDeposit = new PaymentDTO();
 		theDeposit.setAmount(10);
 		theDeposit.setSourceAccount("12345");
 		theDeposit.setSourceSubject("some bank");
 		theDeposit.setDestinationAccount(TARGET_VAULT_ID);
-		theDeposit.setDestinationSubject(ApplicationConstants.APP_NAME);
 		
 		when(paymentRepository.save(any(Payment.class))).thenReturn(thePayment);
 		
 		PaymentDTO storedDeposit = paymentService.deposit(theDeposit);
+		System.out.println(storedDeposit);
 		
 		assertEquals(10.00, storedDeposit.getAmount());
-		assertEquals("12345", storedDeposit.getSourceAccount());
 		assertEquals(TARGET_VAULT_ID, storedDeposit.getDestinationAccount());
 		assertEquals(ApplicationConstants.APP_NAME, storedDeposit.getDestinationSubject());
+		assertEquals("12345", storedDeposit.getSourceAccount());
 		assertEquals("some bank", storedDeposit.getSourceSubject());
 		
 		verify(paymentRepository, times(1)).save(any(Payment.class));
-//		verify(userVaultService, times(1)).deposit(any(MoneyTransferDTO.class));
+		verify(userVaultService, times(1)).deposit(any(PaymentDTO.class));
 	}
 }
