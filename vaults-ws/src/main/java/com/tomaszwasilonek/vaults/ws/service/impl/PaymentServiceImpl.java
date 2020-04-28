@@ -8,7 +8,6 @@ import com.tomaszwasilonek.vaults.ws.entity.Payment;
 import com.tomaszwasilonek.vaults.ws.repositories.PaymentRepository;
 import com.tomaszwasilonek.vaults.ws.service.PaymentService;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 
 @Service
@@ -21,12 +20,11 @@ public class PaymentServiceImpl implements PaymentService {
 	UserVaultService userVaultService;
 
 	@Override
-	public MoneyTransferDTO moneyTransfer(MoneyTransferDTO moneyTransfer) {
-		
-		// TODO: is it the best way to do event sourcing?
+	public PaymentDTO moneyTransfer(PaymentDTO moneyTransfer) {
 		Payment paymentEntity = new Payment();
 		BeanUtils.copyProperties(moneyTransfer, paymentEntity);
 		
+		// update the user vaults
 		userVaultService.moneyTransfer(moneyTransfer);
 		
 		return saveAndReturnPayment(paymentEntity);
@@ -34,17 +32,22 @@ public class PaymentServiceImpl implements PaymentService {
 	
 	@Override
 	public PaymentDTO deposit(PaymentDTO theDeposit) {
-		// TODO Auto-generated method stub
-		return null;
+		Payment paymentEntity = new Payment();
+		BeanUtils.copyProperties(theDeposit, paymentEntity);
+		
+		// update the user vault
+//		userVaultService.deposit(theDeposit);
+		
+		return saveAndReturnPayment(paymentEntity);
 	}
 	
-	private MoneyTransferDTO saveAndReturnPayment(Payment payment) {
+	private PaymentDTO saveAndReturnPayment(Payment payment) {
 		Payment storedTransaction = transactionRepository.save(payment);
-		return mapPaymentEntityToMoneyTransferDTO(storedTransaction);
+		return mapPaymentEntityToPaymentDTO(storedTransaction);
 	}
 	
-	private MoneyTransferDTO mapPaymentEntityToMoneyTransferDTO(Payment payment) {
-		MoneyTransferDTO returnValue = new MoneyTransferDTO();
+	private PaymentDTO mapPaymentEntityToPaymentDTO(Payment payment) {
+		PaymentDTO returnValue = new PaymentDTO();
 		BeanUtils.copyProperties(payment, returnValue);
 		return returnValue;
 	}

@@ -31,7 +31,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @TestPropertySource("/application-dev.properties")
@@ -177,7 +177,7 @@ class UserVaultServiceImplTest {
 	class TestMoneyTransfer {
 		UserVault sourceVault;
 		UserVault targetVault;
-		MoneyTransferDTO payment;
+		PaymentDTO payment;
 		
 		@BeforeEach
 		void setUp() throws Exception {
@@ -191,7 +191,7 @@ class UserVaultServiceImplTest {
 			targetVault.setVaultId("target");
 			targetVault.setBalance(20.00);
 			
-			payment = new MoneyTransferDTO();
+			payment = new PaymentDTO();
 			payment.setAmount(10.00);
 			payment.setSourceAccount("source");
 			payment.setDestinationAccount("target");

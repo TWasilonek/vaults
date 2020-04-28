@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tomaszwasilonek.vaults.ws.service.PaymentService;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
@@ -20,10 +19,9 @@ public class PaymentController {
 	@Autowired
 	PaymentService paymentService;
 
-	// TODO: add body validation
 	// TODO: test if Vaults belong to User -> maybe an Aspect or Annotation?
 	@PostMapping("/money-transfer")
-	public OperationStatusModel makeMoneyTransfer(@RequestBody MoneyTransferDTO moneyTransfer) {
+	public OperationStatusModel makeMoneyTransfer(@RequestBody PaymentDTO moneyTransfer) {
 		OperationStatusModel returnValue = new OperationStatusModel();
 		returnValue.setOperationName(RequestOperationName.MONEY_TRANSFER.name());
 		

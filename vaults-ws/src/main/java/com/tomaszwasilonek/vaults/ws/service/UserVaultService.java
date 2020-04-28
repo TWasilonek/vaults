@@ -3,7 +3,7 @@ package com.tomaszwasilonek.vaults.ws.service;
 import java.util.List;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 public interface UserVaultService {
@@ -17,5 +17,5 @@ public interface UserVaultService {
 	
 	void deleteVault(String vaultId);
 	
-	void moneyTransfer(MoneyTransferDTO transaction);
+	void moneyTransfer(PaymentDTO transaction);
 }

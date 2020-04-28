@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.tomaszwasilonek.vaults.ws.service.impl.PaymentServiceImpl;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
@@ -35,19 +34,19 @@ public class PaymentControllerTest {
 
 	@Test
 	void testMakeMoneyTransfer() {
-		MoneyTransferDTO moneyTransfer = new MoneyTransferDTO();
+		PaymentDTO moneyTransfer = new PaymentDTO();
 		moneyTransfer.setAmount(200);
 		moneyTransfer.setSourceAccount("sourceVaultId");
 		moneyTransfer.setDestinationAccount("targetVaultId");
 		
-		when(paymentService.moneyTransfer(any(MoneyTransferDTO.class))).thenReturn(moneyTransfer);
+		when(paymentService.moneyTransfer(any(PaymentDTO.class))).thenReturn(moneyTransfer);
 		
 		OperationStatusModel response = paymentController.makeMoneyTransfer(moneyTransfer);
 		
 		assertNotNull(response);
 		assertEquals(RequestOperationName.MONEY_TRANSFER.name(), response.getOperationName());
 		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
-		verify(paymentService, times(1)).moneyTransfer(any(MoneyTransferDTO.class));
+		verify(paymentService, times(1)).moneyTransfer(any(PaymentDTO.class));
 	}
 	
 	@Test

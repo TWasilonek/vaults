@@ -16,7 +16,7 @@ import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
-import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @Component
@@ -98,7 +98,7 @@ public class UserVaultServiceImpl implements UserVaultService {
 	}
 	
 	@Override
-	public void moneyTransfer(MoneyTransferDTO moneyTransfer) {	
+	public void moneyTransfer(PaymentDTO moneyTransfer) {	
 		UserVault sourceVault = userVaultsRepository.findByVaultId(moneyTransfer.getSourceAccount());
 		
 		if (sourceVault == null) {
