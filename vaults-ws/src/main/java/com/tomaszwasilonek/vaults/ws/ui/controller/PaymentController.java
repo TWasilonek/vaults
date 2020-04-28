@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tomaszwasilonek.vaults.ws.service.PaymentService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.OperationStatusModel;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationName;
 import com.tomaszwasilonek.vaults.ws.ui.model.response.RequestOperationStatus;
@@ -32,6 +33,16 @@ public class PaymentController {
 		return returnValue;
 	}
 	
-	// TODO: /external/deposit
+	@PostMapping("/deposit")
+	public OperationStatusModel makeDeposit(@RequestBody PaymentDTO theDeposit) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.DEPOSIT.name());
+		
+		paymentService.deposit(theDeposit);
+		
+		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
+	}
+	
 	// TODO: /external/withdraw
 }

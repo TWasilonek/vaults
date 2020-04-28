@@ -9,6 +9,7 @@ import com.tomaszwasilonek.vaults.ws.repositories.PaymentRepository;
 import com.tomaszwasilonek.vaults.ws.service.PaymentService;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
 import com.tomaszwasilonek.vaults.ws.shared.dto.MoneyTransferDTO;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -31,6 +32,12 @@ public class PaymentServiceImpl implements PaymentService {
 		return saveAndReturnPayment(paymentEntity);
 	}
 	
+	@Override
+	public PaymentDTO deposit(PaymentDTO theDeposit) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private MoneyTransferDTO saveAndReturnPayment(Payment payment) {
 		Payment storedTransaction = transactionRepository.save(payment);
 		return mapPaymentEntityToMoneyTransferDTO(storedTransaction);
@@ -41,4 +48,5 @@ public class PaymentServiceImpl implements PaymentService {
 		BeanUtils.copyProperties(payment, returnValue);
 		return returnValue;
 	}
+
 }
