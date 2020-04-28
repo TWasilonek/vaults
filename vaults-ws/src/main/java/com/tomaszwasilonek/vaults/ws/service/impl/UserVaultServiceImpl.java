@@ -98,7 +98,7 @@ public class UserVaultServiceImpl implements UserVaultService {
 	}
 	
 	@Override
-	public void makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {	
+	public void moneyTransfer(MoneyTransferDTO moneyTransfer) {	
 		UserVault sourceVault = userVaultsRepository.findByVaultId(moneyTransfer.getSourceAccount());
 		
 		if (sourceVault == null) {

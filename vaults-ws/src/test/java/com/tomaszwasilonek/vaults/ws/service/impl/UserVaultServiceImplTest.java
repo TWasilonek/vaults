@@ -198,11 +198,11 @@ class UserVaultServiceImplTest {
 		}
 		
 		@Test
-		void testMakeMoneyTransfer() {
+		void testMoneyTransferHappyPath() {
 			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
 			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
 	 		
-			userVaultsService.makeMoneyTransfer(payment);
+			userVaultsService.moneyTransfer(payment);
 			
 			verify(userVaultsRepository, times(1)).findByVaultId("source");
 			verify(userVaultsRepository, times(1)).findByVaultId("target");
@@ -214,32 +214,32 @@ class UserVaultServiceImplTest {
 		}
 		
 		@Test
-		void testMakeMoneyTransfer_sourceVaultNotFound() {	
+		void testMoneyTransfer_sourceVaultNotFound() {	
 			when(userVaultsRepository.findByVaultId("source")).thenReturn(null);
 			
 			assertThrows(EntityNotFoundException.class, () -> {
-				userVaultsService.makeMoneyTransfer(payment);
+				userVaultsService.moneyTransfer(payment);
 			});
 		}
 		
 		@Test
-		void testMakeMoneyTransfer_targetVaultNotFound() {			
+		void testMoneyTransfer_targetVaultNotFound() {			
 			when(userVaultsRepository.findByVaultId("target")).thenReturn(null);
 			
 			assertThrows(EntityNotFoundException.class, () -> {
-				userVaultsService.makeMoneyTransfer(payment);
+				userVaultsService.moneyTransfer(payment);
 			});
 		}
 		
 		@Test
-		void testMakeMoneyTransfer_sourceVaultBalanceTooLow() {
+		void testMoneyTransfer_sourceVaultBalanceTooLow() {
 			sourceVault.setBalance(0);
 			
 			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
 			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
 			
 			assertThrows(BalanceTooLowException.class, () -> {
-				userVaultsService.makeMoneyTransfer(payment);
+				userVaultsService.moneyTransfer(payment);
 			});
 		}
 	}

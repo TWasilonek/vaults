@@ -54,14 +54,14 @@ public class PaymentServiceTest {
 	void testMakeMoneyTransfer() {
 		when(paymentRepository.save(any(Payment.class))).thenReturn(moneyTransfer);
 		
-		MoneyTransferDTO storedTransaction = paymentService.makeMoneyTransfer(moneyTransferDTO);
+		MoneyTransferDTO storedTransaction = paymentService.moneyTransfer(moneyTransferDTO);
 		
 		assertEquals(10.00, storedTransaction.getAmount());
 		assertEquals(SOURCE_VAULT_ID, storedTransaction.getSourceAccount());
 		assertEquals(TARGET_VAULT_ID, storedTransaction.getDestinationAccount());
 		
 		verify(paymentRepository, times(1)).save(any(Payment.class));
-		verify(userVaultService, times(1)).makeMoneyTransfer(any(MoneyTransferDTO.class));
+		verify(userVaultService, times(1)).moneyTransfer(any(MoneyTransferDTO.class));
 	}
 
 }

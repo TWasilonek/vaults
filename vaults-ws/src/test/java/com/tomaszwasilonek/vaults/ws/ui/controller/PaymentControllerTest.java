@@ -41,12 +41,12 @@ public class PaymentControllerTest {
 		moneyTransfer.setSourceAccount("sourceVaultId");
 		moneyTransfer.setDestinationAccount("targetVaultId");
 		
-		when(paymentService.makeMoneyTransfer(any(MoneyTransferDTO.class))).thenReturn(moneyTransfer);
+		when(paymentService.moneyTransfer(any(MoneyTransferDTO.class))).thenReturn(moneyTransfer);
 		
 		OperationStatusModel response = paymentController.makeMoneyTransfer(moneyTransfer);
 		assertNotNull(response);
 		assertEquals(RequestOperationName.MONEY_TRANSFER.name(), response.getOperationName());
 		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
-		verify(paymentService, times(1)).makeMoneyTransfer(any(MoneyTransferDTO.class));
+		verify(paymentService, times(1)).moneyTransfer(any(MoneyTransferDTO.class));
 	}
 }

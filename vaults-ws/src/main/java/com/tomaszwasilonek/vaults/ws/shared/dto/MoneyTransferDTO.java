@@ -1,6 +1,6 @@
 package com.tomaszwasilonek.vaults.ws.shared.dto;
 
-import com.tomaszwasilonek.vaults.ws.shared.constants.ApplicationConstants;
+import com.tomaszwasilonek.vaults.ws.shared.constants.ApplicationConstants;  
 
 import lombok.Data;
 

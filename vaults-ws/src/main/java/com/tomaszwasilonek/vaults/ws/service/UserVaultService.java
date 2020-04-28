@@ -17,5 +17,5 @@ public interface UserVaultService {
 	
 	void deleteVault(String vaultId);
 	
-	void makeMoneyTransfer(MoneyTransferDTO transaction);
+	void moneyTransfer(MoneyTransferDTO transaction);
 }

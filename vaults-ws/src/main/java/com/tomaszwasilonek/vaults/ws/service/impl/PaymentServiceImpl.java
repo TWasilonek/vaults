@@ -20,13 +20,13 @@ public class PaymentServiceImpl implements PaymentService {
 	UserVaultService userVaultService;
 
 	@Override
-	public MoneyTransferDTO makeMoneyTransfer(MoneyTransferDTO moneyTransfer) {
+	public MoneyTransferDTO moneyTransfer(MoneyTransferDTO moneyTransfer) {
 		
 		// TODO: is it the best way to do event sourcing?
 		Payment paymentEntity = new Payment();
 		BeanUtils.copyProperties(moneyTransfer, paymentEntity);
 		
-		userVaultService.makeMoneyTransfer(moneyTransfer);
+		userVaultService.moneyTransfer(moneyTransfer);
 		
 		return saveAndReturnPayment(paymentEntity);
 	}

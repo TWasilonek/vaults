@@ -26,7 +26,7 @@ public class PaymentController {
 		OperationStatusModel returnValue = new OperationStatusModel();
 		returnValue.setOperationName(RequestOperationName.MONEY_TRANSFER.name());
 		
-		paymentService.makeMoneyTransfer(moneyTransfer);
+		paymentService.moneyTransfer(moneyTransfer);
 		
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;
