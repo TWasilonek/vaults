@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import com.tomaszwasilonek.vaults.ws.entity.Payment;
 import com.tomaszwasilonek.vaults.ws.repositories.PaymentRepository;
 import com.tomaszwasilonek.vaults.ws.shared.constants.ApplicationConstants;
+import com.tomaszwasilonek.vaults.ws.shared.constants.PaymentType;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 
 public class PaymentServiceTest {
@@ -74,8 +75,10 @@ public class PaymentServiceTest {
 		thePayment.setSourceSubject("some bank");
 		thePayment.setDestinationAccount(TARGET_VAULT_ID);
 		thePayment.setDestinationSubject(ApplicationConstants.APP_NAME);
+		thePayment.setPaymentType(PaymentType.DEPOSIT);
 		
 		PaymentDTO theDeposit = new PaymentDTO();
+		theDeposit.setPaymentType(PaymentType.DEPOSIT);
 		theDeposit.setAmount(10);
 		theDeposit.setSourceAccount("12345");
 		theDeposit.setSourceSubject("some bank");
@@ -85,6 +88,7 @@ public class PaymentServiceTest {
 		
 		PaymentDTO storedDeposit = paymentService.deposit(theDeposit);
 		
+		assertEquals(PaymentType.DEPOSIT, storedDeposit.getPaymentType());
 		assertEquals(10.00, storedDeposit.getAmount());
 		assertEquals(TARGET_VAULT_ID, storedDeposit.getDestinationAccount());
 		assertEquals(ApplicationConstants.APP_NAME, storedDeposit.getDestinationSubject());

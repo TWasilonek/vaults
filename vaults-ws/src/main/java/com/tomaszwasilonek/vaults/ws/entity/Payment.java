@@ -32,31 +32,25 @@ public class Payment extends AuditModel implements Serializable {/**
 	private long id;
 	
 	@Column(nullable=false)
-	private String transactionId;
+	private String paymentId;
 	
-	@NotBlank(message = "amount is required")
 	@Column(nullable=false)
 	private double amount;
 	
-	@NotBlank(message = "source account is required")
 	@Column(nullable=false)
 	private String sourceAccount;
 	
-	@NotBlank(message = "source subject is required")
 	@Column(nullable=false)
 	private String sourceSubject;
 	
-	@NotBlank(message = "destination account is required")
 	@Column(nullable=false)
 	private String destinationSubject;
 	
-	@NotBlank(message = "destination subject is required")
 	@Column(nullable=false)
 	private String destinationAccount;
 	
 	private String description;
 	
-	@NotBlank(message = "paymentType must be set")
 	@Column(nullable=false)
 	private PaymentType paymentType;
 	

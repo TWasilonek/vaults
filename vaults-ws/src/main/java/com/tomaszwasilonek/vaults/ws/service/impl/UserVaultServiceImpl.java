@@ -2,6 +2,7 @@ package com.tomaszwasilonek.vaults.ws.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -15,7 +16,6 @@ import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
-import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
@@ -24,10 +24,6 @@ public class UserVaultServiceImpl implements UserVaultService {
 	
 	@Autowired
 	UserVaultRepository userVaultsRepository;
-
-	@Autowired
-	Utils utils;
-	
 
 	@Override
 	public UserVaultDto createVault(UserEntity user, UserVaultDto vault) {
@@ -39,9 +35,8 @@ public class UserVaultServiceImpl implements UserVaultService {
 		UserVault vaultsEntity = new UserVault();
 		BeanUtils.copyProperties(vault, vaultsEntity);
 		
-		String publicVaultId = utils.generateVaultId(30);
 		vaultsEntity.setName(vault.getName());
-		vaultsEntity.setVaultId(publicVaultId);
+		vaultsEntity.setVaultId(UUID.randomUUID().toString());
 		vaultsEntity.setUserDetails(user);
 		vaultsEntity.setBalance(0.00);
 		

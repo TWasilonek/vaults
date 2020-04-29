@@ -1,6 +1,6 @@
 package com.tomaszwasilonek.vaults.ws.shared.dto;
 
-import com.tomaszwasilonek.vaults.ws.shared.constants.ApplicationConstants;
+import com.tomaszwasilonek.vaults.ws.shared.constants.PaymentType;
 
 import lombok.Data;
 
@@ -11,4 +11,5 @@ public class PaymentDTO {
 	private String sourceSubject;
 	private String destinationAccount;
 	private String destinationSubject;
+	private PaymentType paymentType;
 }
