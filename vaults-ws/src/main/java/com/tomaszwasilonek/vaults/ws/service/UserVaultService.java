@@ -20,4 +20,6 @@ public interface UserVaultService {
 	void moneyTransfer(PaymentDTO transaction);
 	
 	void deposit(PaymentDTO deposit);
+
+	void withdraw(PaymentDTO theWithdrawal);
 }

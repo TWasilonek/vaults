@@ -66,4 +66,22 @@ public class PaymentControllerTest {
 		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
 		verify(paymentService, times(1)).deposit(any(PaymentDTO.class));
 	}
+	
+	@Test
+	void testMakeWithdrawal() {
+		PaymentDTO theWithdrawal = new PaymentDTO();
+		theWithdrawal.setAmount(10);
+		theWithdrawal.setSourceAccount("sourceVaultId");
+		theWithdrawal.setDestinationSubject("some bank");
+		theWithdrawal.setDestinationAccount("12345");
+		
+		when(paymentService.withdraw(any(PaymentDTO.class))).thenReturn(theWithdrawal);
+		
+		OperationStatusModel response = paymentController.makeWithdrawal(theWithdrawal);
+		
+		assertNotNull(response);
+		assertEquals(RequestOperationName.WITHDRAWAL.name(), response.getOperationName());
+		assertEquals(RequestOperationStatus.SUCCESS.name(), response.getOperationResult());
+		verify(paymentService, times(1)).withdraw(any(PaymentDTO.class));
+	}
 }

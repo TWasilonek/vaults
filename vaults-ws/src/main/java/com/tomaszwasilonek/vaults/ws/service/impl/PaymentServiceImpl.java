@@ -29,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
 		paymentEntity.setDestinationSubject(ApplicationConstants.APP_NAME);
 		paymentEntity.setSourceSubject(ApplicationConstants.APP_NAME);
 		
+		// TODO: change the API to be more generic, ex. setVaultBalance(vaultId, balance);
 		// update the user vaults
 		userVaultService.moneyTransfer(moneyTransfer);
 		
@@ -49,6 +50,20 @@ public class PaymentServiceImpl implements PaymentService {
 		return saveAndReturnPayment(paymentEntity);
 	}
 	
+	@Override
+	public PaymentDTO withdraw(PaymentDTO theWithdrawal) {
+		Payment paymentEntity = new Payment();
+		BeanUtils.copyProperties(theWithdrawal, paymentEntity);
+		
+		// the source account is a user vault
+		paymentEntity.setSourceSubject(ApplicationConstants.APP_NAME);
+		
+		// update the user vault
+		userVaultService.withdraw(theWithdrawal);
+		
+		return saveAndReturnPayment(paymentEntity);
+	}
+	
 	private PaymentDTO saveAndReturnPayment(Payment payment) {
 		Payment storedPayment = transactionRepository.save(payment);
 		return mapPaymentEntityToPaymentDTO(storedPayment);
@@ -59,5 +74,4 @@ public class PaymentServiceImpl implements PaymentService {
 		BeanUtils.copyProperties(payment, returnValue);
 		return returnValue;
 	}
-
 }

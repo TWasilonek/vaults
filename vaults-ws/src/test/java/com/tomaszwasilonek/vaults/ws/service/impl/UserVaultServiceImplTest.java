@@ -198,7 +198,7 @@ class UserVaultServiceImplTest {
 		}
 		
 		@Test
-		void testMoneyTransferHappyPath() {
+		void testMoneyTransfer_HappyPath() {
 			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
 			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
 	 		
@@ -280,6 +280,46 @@ class UserVaultServiceImplTest {
 			
 			assertThrows(EntityNotFoundException.class, () -> {
 				userVaultsService.deposit(payment);
+			});
+		}
+	}
+	
+	@Nested
+	class testWithdrawal {
+		UserVault sourceVault;
+		PaymentDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {			
+			sourceVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, sourceVault);
+			sourceVault.setVaultId("source");
+			sourceVault.setBalance(20.00);
+			
+			payment = new PaymentDTO();
+			payment.setAmount(10.00);
+			payment.setSourceAccount("source");
+			payment.setDestinationAccount("target");
+		}
+		
+		@Test
+		void testWithdrawal_HappyPath() {
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+	 		
+			userVaultsService.withdraw(payment);
+			
+			verify(userVaultsRepository, times(1)).findByVaultId("source");
+			verify(userVaultsRepository, times(1)).save(any(UserVault.class));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "source" && aVault.getBalance() == 10.00));
+		}
+		
+		@Test
+		void testWithdrawal_sourceVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.withdraw(payment);
 			});
 		}
 	}

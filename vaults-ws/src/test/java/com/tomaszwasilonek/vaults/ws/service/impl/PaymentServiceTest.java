@@ -84,7 +84,6 @@ public class PaymentServiceTest {
 		when(paymentRepository.save(any(Payment.class))).thenReturn(thePayment);
 		
 		PaymentDTO storedDeposit = paymentService.deposit(theDeposit);
-		System.out.println(storedDeposit);
 		
 		assertEquals(10.00, storedDeposit.getAmount());
 		assertEquals(TARGET_VAULT_ID, storedDeposit.getDestinationAccount());
@@ -94,5 +93,32 @@ public class PaymentServiceTest {
 		
 		verify(paymentRepository, times(1)).save(any(Payment.class));
 		verify(userVaultService, times(1)).deposit(any(PaymentDTO.class));
+	}
+	
+	@Test
+	void testWithdrawal() {
+		thePayment.setSourceAccount(SOURCE_VAULT_ID);
+		thePayment.setSourceSubject(ApplicationConstants.APP_NAME);
+		thePayment.setDestinationAccount("12345");
+		thePayment.setDestinationSubject("some bank");
+		
+		PaymentDTO theWithdrawal = new PaymentDTO();
+		theWithdrawal.setAmount(10);
+		theWithdrawal.setSourceAccount(SOURCE_VAULT_ID);
+		theWithdrawal.setSourceSubject(ApplicationConstants.APP_NAME);
+		theWithdrawal.setDestinationAccount("12345");
+		
+		when(paymentRepository.save(any(Payment.class))).thenReturn(thePayment);
+		
+		PaymentDTO storedWithdrawal = paymentService.withdraw(theWithdrawal);
+		
+		assertEquals(10.00, storedWithdrawal.getAmount());
+		assertEquals(SOURCE_VAULT_ID, storedWithdrawal.getSourceAccount());
+		assertEquals(ApplicationConstants.APP_NAME, storedWithdrawal.getSourceSubject());
+		assertEquals("12345", storedWithdrawal.getDestinationAccount());
+		assertEquals("some bank", storedWithdrawal.getDestinationSubject());
+		
+		verify(paymentRepository, times(1)).save(any(Payment.class));
+		verify(userVaultService, times(1)).withdraw(any(PaymentDTO.class));
 	}
 }

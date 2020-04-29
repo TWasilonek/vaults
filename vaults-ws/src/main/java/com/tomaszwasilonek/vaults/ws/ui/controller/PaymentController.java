@@ -42,5 +42,14 @@ public class PaymentController {
 		return returnValue;
 	}
 	
-	// TODO: /external/withdraw
+	@PostMapping("/withdraw")
+	public OperationStatusModel makeWithdrawal(@RequestBody PaymentDTO theWithdrawal) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.WITHDRAWAL.name());
+		
+		paymentService.withdraw(theWithdrawal);
+		
+		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
+	}
 }

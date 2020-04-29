@@ -134,6 +134,19 @@ public class UserVaultServiceImpl implements UserVaultService {
 		
 		userVaultsRepository.save(targetVault);
 	}
+	
+	@Override
+	public void withdraw(PaymentDTO theWithdrawal) {
+		UserVault sourceVault = userVaultsRepository.findByVaultId(theWithdrawal.getSourceAccount());
+		
+		if (sourceVault == null) {
+			throw new EntityNotFoundException(UserVault.class, "vault_id", theWithdrawal.getSourceAccount());
+		}
+		
+		sourceVault.setBalance(sourceVault.getBalance() - theWithdrawal.getAmount());
+		
+		userVaultsRepository.save(sourceVault);
+	}
 
 	private UserVaultDto saveAndReturnStoredVaultDetails(UserVault vault) {
 		UserVault storedVaultDetails = userVaultsRepository.save(vault);
@@ -145,5 +158,4 @@ public class UserVaultServiceImpl implements UserVaultService {
 		BeanUtils.copyProperties(vault, returnValue);
 		return returnValue;
 	}
-
 }
