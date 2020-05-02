@@ -2,6 +2,7 @@ package com.tomaszwasilonek.vaults.ws.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserService;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
-import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
@@ -29,9 +29,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
-
-	@Autowired
-	Utils utils;
 
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -49,9 +46,8 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(user, userEntity);
 
-		String publicUserId = utils.generateUserId(30);
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		userEntity.setUserId(publicUserId);
+		userEntity.setUserId(UUID.randomUUID().toString());
 
 		return saveAndReturnStoredUserDetails(userEntity);
 	}

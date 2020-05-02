@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,10 +25,12 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.tomaszwasilonek.vaults.ws.entity.UserEntity;
 import com.tomaszwasilonek.vaults.ws.entity.UserVault;
+import com.tomaszwasilonek.vaults.ws.exceptions.BalanceTooLowException;
 import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserVaultRepository;
 import com.tomaszwasilonek.vaults.ws.shared.Utils;
+import com.tomaszwasilonek.vaults.ws.shared.dto.PaymentDTO;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
 @TestPropertySource("/application-dev.properties")
@@ -60,7 +63,6 @@ class UserVaultServiceImplTest {
 
 	@Test
 	void testCreateVault() {
-		when(utils.generateVaultId(anyInt())).thenReturn(VAULT_ID);
 		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(userVaultsEntity);
 		
 		UserVaultDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultDto());
@@ -69,7 +71,6 @@ class UserVaultServiceImplTest {
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
 		assertEquals(userVaultsEntity.getBalance(), storedVault.getBalance());
 		assertEquals(userVaultsEntity.getVaultId(), storedVault.getVaultId());
-		verify(utils, times(1)).generateVaultId(anyInt());
 		verify(userVaultsRepository, times(1)).save(any(UserVault.class));
 	}
 
@@ -168,5 +169,155 @@ class UserVaultServiceImplTest {
 			userVaultsService.deleteVault(VAULT_ID);
 		});
 	}
-
+	
+	@Nested
+	class TestMoneyTransfer {
+		UserVault sourceVault;
+		UserVault targetVault;
+		PaymentDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			sourceVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, sourceVault);
+			sourceVault.setVaultId("source");
+			sourceVault.setBalance(10.00);
+			
+			targetVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, targetVault);
+			targetVault.setVaultId("target");
+			targetVault.setBalance(20.00);
+			
+			payment = new PaymentDTO();
+			payment.setAmount(10.00);
+			payment.setSourceAccount("source");
+			payment.setDestinationAccount("target");
+		}
+		
+		@Test
+		void testMoneyTransfer_HappyPath() {
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+	 		
+			userVaultsService.moneyTransfer(payment);
+			
+			verify(userVaultsRepository, times(1)).findByVaultId("source");
+			verify(userVaultsRepository, times(1)).findByVaultId("target");
+			verify(userVaultsRepository, times(2)).save(any(UserVault.class));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "source" && aVault.getBalance() == 0));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "target" && aVault.getBalance() == 30.00));
+		}
+		
+		@Test
+		void testMoneyTransfer_sourceVaultNotFound() {	
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.moneyTransfer(payment);
+			});
+		}
+		
+		@Test
+		void testMoneyTransfer_targetVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.moneyTransfer(payment);
+			});
+		}
+		
+		@Test
+		void testMoneyTransfer_sourceVaultBalanceTooLow() {
+			sourceVault.setBalance(0);
+			
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+			
+			assertThrows(BalanceTooLowException.class, () -> {
+				userVaultsService.moneyTransfer(payment);
+			});
+		}
+	}
+	
+	@Nested
+	class testDeposit {
+		UserVault targetVault;
+		PaymentDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {			
+			targetVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, targetVault);
+			targetVault.setVaultId("target");
+			targetVault.setBalance(20.00);
+			
+			payment = new PaymentDTO();
+			payment.setAmount(10.00);
+			payment.setSourceAccount("source");
+			payment.setDestinationAccount("target");
+		}
+		
+		@Test
+		void testDeposit_HappyPath() {
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(targetVault);
+	 		
+			userVaultsService.deposit(payment);
+			
+			verify(userVaultsRepository, times(1)).findByVaultId("target");
+			verify(userVaultsRepository, times(1)).save(any(UserVault.class));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "target" && aVault.getBalance() == 30.00));
+		}
+		
+		@Test
+		void testDeposit_targetVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("target")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.deposit(payment);
+			});
+		}
+	}
+	
+	@Nested
+	class testWithdrawal {
+		UserVault sourceVault;
+		PaymentDTO payment;
+		
+		@BeforeEach
+		void setUp() throws Exception {			
+			sourceVault = new UserVault();
+			BeanUtils.copyProperties(userVaultsEntity, sourceVault);
+			sourceVault.setVaultId("source");
+			sourceVault.setBalance(20.00);
+			
+			payment = new PaymentDTO();
+			payment.setAmount(10.00);
+			payment.setSourceAccount("source");
+			payment.setDestinationAccount("target");
+		}
+		
+		@Test
+		void testWithdrawal_HappyPath() {
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(sourceVault);
+	 		
+			userVaultsService.withdraw(payment);
+			
+			verify(userVaultsRepository, times(1)).findByVaultId("source");
+			verify(userVaultsRepository, times(1)).save(any(UserVault.class));
+			verify(userVaultsRepository).save(argThat(
+					(UserVault aVault) -> aVault.getVaultId() == "source" && aVault.getBalance() == 10.00));
+		}
+		
+		@Test
+		void testWithdrawal_sourceVaultNotFound() {			
+			when(userVaultsRepository.findByVaultId("source")).thenReturn(null);
+			
+			assertThrows(EntityNotFoundException.class, () -> {
+				userVaultsService.withdraw(payment);
+			});
+		}
+	}
 }
