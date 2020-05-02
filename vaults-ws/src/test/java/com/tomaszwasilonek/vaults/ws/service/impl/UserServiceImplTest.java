@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,7 +32,6 @@ import com.tomaszwasilonek.vaults.ws.exceptions.EntityNotFoundException;
 import com.tomaszwasilonek.vaults.ws.exceptions.RecordAlreadyExistsException;
 import com.tomaszwasilonek.vaults.ws.repositories.UserRepository;
 import com.tomaszwasilonek.vaults.ws.service.UserVaultService;
-import com.tomaszwasilonek.vaults.ws.shared.Utils;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserDto;
 import com.tomaszwasilonek.vaults.ws.shared.dto.UserVaultDto;
 
@@ -45,9 +43,6 @@ class UserServiceImplTest {
 	
 	@Mock
 	UserRepository userRepository;
-	
-	@Mock
-	Utils utils;
 
 	@Mock
 	BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -142,7 +137,6 @@ class UserServiceImplTest {
 	@Test
 	final void testCreateUser() {
 		when(userRepository.findByEmail(anyString())).thenReturn(null);
-		when(utils.generateUserId(anyInt())).thenReturn(USER_ID);
 		when(bCryptPasswordEncoder.encode(anyString())).thenReturn(RAW_PASSWORD);
 		when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 		
@@ -155,7 +149,6 @@ class UserServiceImplTest {
 		assertEquals(userEntity.getLastName(), storedUserDetails.getLastName());
 		assertEquals(userEntity.getEmail(), storedUserDetails.getEmail());
 		verify(bCryptPasswordEncoder, times(1)).encode(RAW_PASSWORD);
-		verify(utils, times(1)).generateUserId(anyInt());
 		verify(userRepository, times(1)).save(any(UserEntity.class));
 	}
 	

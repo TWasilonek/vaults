@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
@@ -64,7 +63,6 @@ class UserVaultServiceImplTest {
 
 	@Test
 	void testCreateVault() {
-		when(utils.generateVaultId(anyInt())).thenReturn(VAULT_ID);
 		when(userVaultsRepository.save(any(UserVault.class))).thenReturn(userVaultsEntity);
 		
 		UserVaultDto storedVault = userVaultsService.createVault(new UserEntity(), new UserVaultDto());
@@ -73,7 +71,6 @@ class UserVaultServiceImplTest {
 		assertEquals(userVaultsEntity.getName(), storedVault.getName());
 		assertEquals(userVaultsEntity.getBalance(), storedVault.getBalance());
 		assertEquals(userVaultsEntity.getVaultId(), storedVault.getVaultId());
-		verify(utils, times(1)).generateVaultId(anyInt());
 		verify(userVaultsRepository, times(1)).save(any(UserVault.class));
 	}
 
