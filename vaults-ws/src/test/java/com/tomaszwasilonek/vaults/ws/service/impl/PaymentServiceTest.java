@@ -48,18 +48,21 @@ public class PaymentServiceTest {
 		thePayment.setDestinationAccount(TARGET_VAULT_ID);
 		thePayment.setSourceSubject(ApplicationConstants.APP_NAME);
 		thePayment.setDestinationSubject(ApplicationConstants.APP_NAME);
+		thePayment.setPaymentType(PaymentType.MONEY_TRANSFER);
 	
 		PaymentDTO moneyTransferDTO;
 		moneyTransferDTO = new PaymentDTO();
 		moneyTransferDTO.setAmount(10.00);
 		moneyTransferDTO.setSourceAccount(SOURCE_VAULT_ID);
 		moneyTransferDTO.setDestinationAccount(TARGET_VAULT_ID);
+		thePayment.setPaymentType(PaymentType.MONEY_TRANSFER);
 		
 		when(paymentRepository.save(any(Payment.class))).thenReturn(thePayment);
 		
 		PaymentDTO storedMoneyTransfer = paymentService.moneyTransfer(moneyTransferDTO);
 		
 		assertEquals(10.00, storedMoneyTransfer.getAmount());
+		assertEquals(PaymentType.MONEY_TRANSFER, storedMoneyTransfer.getPaymentType());
 		assertEquals(SOURCE_VAULT_ID, storedMoneyTransfer.getSourceAccount());
 		assertEquals(TARGET_VAULT_ID, storedMoneyTransfer.getDestinationAccount());
 		assertEquals(ApplicationConstants.APP_NAME, storedMoneyTransfer.getDestinationSubject());
@@ -105,18 +108,21 @@ public class PaymentServiceTest {
 		thePayment.setSourceSubject(ApplicationConstants.APP_NAME);
 		thePayment.setDestinationAccount("12345");
 		thePayment.setDestinationSubject("some bank");
+		thePayment.setPaymentType(PaymentType.WITHDRAWAL);
 		
 		PaymentDTO theWithdrawal = new PaymentDTO();
 		theWithdrawal.setAmount(10);
 		theWithdrawal.setSourceAccount(SOURCE_VAULT_ID);
 		theWithdrawal.setSourceSubject(ApplicationConstants.APP_NAME);
 		theWithdrawal.setDestinationAccount("12345");
+		theWithdrawal.setPaymentType(PaymentType.WITHDRAWAL);
 		
 		when(paymentRepository.save(any(Payment.class))).thenReturn(thePayment);
 		
 		PaymentDTO storedWithdrawal = paymentService.withdraw(theWithdrawal);
 		
 		assertEquals(10.00, storedWithdrawal.getAmount());
+		assertEquals(PaymentType.WITHDRAWAL, storedWithdrawal.getPaymentType());
 		assertEquals(SOURCE_VAULT_ID, storedWithdrawal.getSourceAccount());
 		assertEquals(ApplicationConstants.APP_NAME, storedWithdrawal.getSourceSubject());
 		assertEquals("12345", storedWithdrawal.getDestinationAccount());

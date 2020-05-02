@@ -16,10 +16,10 @@ public class WithdrawalRequestModel {
 	@NotBlank(message = "source account is required")
 	private String sourceAccount;
 	
-	@NotBlank(message = "destination account is required")
+	@NotBlank(message = "destination subject is required")
 	private String destinationSubject;
 	
-	@NotBlank(message = "destination subject is required")
+	@NotBlank(message = "destination account is required")
 	private String destinationAccount;
 	
 	private String description;
