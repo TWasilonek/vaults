@@ -25,7 +25,7 @@ public class PaymentController {
 	@Autowired
 	PaymentService paymentService;
 
-	// TODO: test if Vaults belong to User -> maybe an Aspect or Annotation?
+	// TODO: test if Vaults belong to User
 	@PostMapping("/money-transfer")
 	public OperationStatusModel makeMoneyTransfer(@Valid @RequestBody MoneyTransferRequestModel moneyTransferBody) {
 		OperationStatusModel returnValue = new OperationStatusModel();
