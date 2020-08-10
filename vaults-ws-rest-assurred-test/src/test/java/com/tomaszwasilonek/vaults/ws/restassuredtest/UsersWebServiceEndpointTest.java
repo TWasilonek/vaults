@@ -10,6 +10,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 
@@ -135,11 +140,17 @@ class UsersWebServiceEndpointTest {
 				extract().response();
 		
 		authorizationHeader = response.header("Authorization");
-		// TODO: Get the userId from token
-//		userId = response.header("UserID");
+		String token = authorizationHeader.split(" ")[1];
 		
-		assertNotNull(authorizationHeader);
-		assertNotNull(userId);
+		try {
+		    DecodedJWT jwt = JWT.decode(token);
+		    userId = jwt.getClaim("id").asString();
+			
+			assertNotNull(authorizationHeader);
+			assertNotNull(userId);
+		} catch (JWTDecodeException exception){
+		    System.out.println(exception);
+		}
 	}
 	
 	@Test
