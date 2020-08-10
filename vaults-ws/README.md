@@ -8,10 +8,8 @@ This is my playground for Java, Spring Boot and backend concepts, so although fu
 
 ## Install and run
 
-It's a standard Spring Boot app, so to run it:
- - open it your favorite IDE
- - install Maven dependencies
- - set up a MySQL database
+ - set up a MySQL database and run it on the standard port `3306`
+ - open the project in your favorite IDE
  - set the properties (ex. in `application.properties` ) for the database access and JWT token secret
  - build the project: `$ mvn install`
  - run it: `$ java -jar target/vaults-ws-1.2.0.jar` or `$ mvn spring-boot:run`
